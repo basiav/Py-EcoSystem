@@ -1,0 +1,104 @@
+#!/usr/bin/python3
+import plot
+from common import pygame, plt
+from animals import *
+from plot import PlotPhotos, StartMenu
+import config
+
+import matplotlib
+import matplotlib.backends.backend_agg as agg
+from matplotlib.figure import Figure
+
+matplotlib.use("Agg")
+
+
+def create_start_menu():
+    return StartMenu(700, 700)
+
+
+def start_simulation():
+    plot = PlotPhotos(700, 700, agg)
+
+    fig = Figure(figsize=(2, 2), dpi=800)
+    canvas = agg.FigureCanvasAgg(fig)
+
+    N, wyspa, rabbit_no, wolf_no, reproduction_chances, stats, stats_arrs = config.get_aliased_global_variable_names()
+
+    def update_stats_arr():
+        stats_arrs['rabbits'].append(stats['rabbits'])
+        stats_arrs['wolves_females'].append(stats['wolves_females'])
+        stats_arrs['wolves_males'].append(stats['wolves_males'])
+
+    def create_bar_img():
+        update_stats_arr()
+        nonlocal canvas, fig
+        fig.clf()
+        ax = fig.add_subplot()
+        ax.plot(range(len(stats_arrs['rabbits'])), stats_arrs['rabbits'], color="yellow")
+        ax.plot(range(len(stats_arrs['wolves_females'])), stats_arrs['wolves_females'], color="pink")
+        ax.plot(range(len(stats_arrs['wolves_males'])), stats_arrs['wolves_males'], color="blue")
+        ax.set_title("Animal population in Time", fontsize=8)
+        ax.set_xlabel('distance (m)')
+        ax.set_ylabel('Damped oscillation')
+        canvas.draw()
+        renderer = canvas.get_renderer()
+        return renderer.tostring_rgb()
+
+    def create_animal_on_random_pos(animal):
+        return Rabbit(random.randint(0, N - 1), random.randint(0, N - 1)) if animal == Animals.Rabbit \
+            else Wolf(random.randint(0, N - 1), random.randint(0, N - 1))
+
+    plt.xlim(0, 1)
+    plt.ylim(0, 20)
+
+    once = False
+    while plot.running:
+        minimum = min(wolf_no, rabbit_no)
+        image = create_bar_img()
+
+        while not once:
+            for n in range(minimum):
+                # Rabbits
+                create_animal_on_random_pos(Animals.Rabbit).start()
+                plot.update(image, canvas)
+
+                # Wolves
+                create_animal_on_random_pos(Animals.Wolf_In_General).start()
+                plot.update(image, canvas)
+
+                time.sleep(0.1)
+
+            if minimum == wolf_no:
+                for i in range(abs(wolf_no - rabbit_no)):
+                    # Rabbits
+                    create_animal_on_random_pos(Animals.Rabbit).start()
+                    plot.update(image, canvas)
+
+            elif minimum == rabbit_no:
+                # Wolves
+                for i in range(abs(wolf_no - rabbit_no)):
+                    create_animal_on_random_pos(Animals.Wolf_In_General).start()
+                    plot.update(image, canvas)
+
+            once = True
+
+        plot.update(image, canvas)
+
+    pygame.quit()
+
+
+def main():
+    start_menu = create_start_menu()
+
+    while not start_menu.start_game:
+        start_menu.update()
+
+    print("[MAIN] Going to start game!")
+    start_menu.quit_start_menu()
+
+    print("Game:")
+    start_simulation()
+
+
+if __name__ == '__main__':
+    main()
