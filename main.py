@@ -21,7 +21,8 @@ def start_simulation():
     fig = Figure(figsize=(2, 2), dpi=800)
     canvas = agg.FigureCanvasAgg(fig)
 
-    N, wyspa, rabbit_no, wolf_no, reproduction_chances, stats, stats_arrs = config.get_aliased_global_variable_names()
+    N, wyspa, rabbit_no, wolf_no, rabit_reproduction_chances, wolf_reproduction_chances, stats, stats_arrs \
+        = config.get_aliased_global_variable_names()
 
     def update_stats_arr():
         stats_arrs['rabbits'].append(stats['rabbits'])

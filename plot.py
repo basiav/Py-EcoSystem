@@ -31,7 +31,7 @@ def create_legend():
 
 def print_settings():
     print("Settings:", "[ N: ", cfg.N, "]", "[ Rabbits: ", cfg.rabbit_no, "]", "[ Wolves: ", cfg.wolf_no, "]",
-          "[ Reproduction chances: ", cfg.reproduction_chances / 100, "]")
+          "[ Reproduction chances: ", cfg.rabbit_reproduction_chances / 100, "]")
 
 
 class GUIElements:
@@ -370,14 +370,18 @@ class SettingsMenu(Plot):
         rabbits_no_slider_x, rabbits_no_slider_y = 100, 200
         wolves_no_slider_x, wolves_no_slider_y = 100, 300
         rabbit_reproduction_rate_slider_x, rabbit_reproduction_rate_slider_y = 100, 400
+        wolf_reproduction_rate_slider_x, wolf_reproduction_rate_slider_y = 100, 500
 
         slider_N = GUIElements.Slider(N_slider_x, N_slider_y, slider_width, slider_height, slider_colour)
         slider_rabbits = GUIElements.Slider(rabbits_no_slider_x, rabbits_no_slider_y, slider_width, slider_height,
                                             slider_colour)
         slider_wolves = GUIElements.Slider(wolves_no_slider_x, wolves_no_slider_y, slider_width, slider_height,
                                            slider_colour)
-        slider_reproduction_rate = GUIElements.Slider(rabbit_reproduction_rate_slider_x,
+        slider_rabbit_reproduction_rate = GUIElements.Slider(rabbit_reproduction_rate_slider_x,
                                                       rabbit_reproduction_rate_slider_y, slider_width, slider_height,
+                                                      slider_colour)
+        slider_wolf_reproduction_rate = GUIElements.Slider(wolf_reproduction_rate_slider_x,
+                                                      wolf_reproduction_rate_slider_y, slider_width, slider_height,
                                                       slider_colour)
 
         slider_N.set_default_range(default_N, default_N * 10)
@@ -419,7 +423,8 @@ class SettingsMenu(Plot):
             slider_N.perform(self.window)
             slider_rabbits.perform(self.window)
             slider_wolves.perform(self.window)
-            slider_reproduction_rate.perform(self.window)
+            slider_rabbit_reproduction_rate.perform(self.window)
+            slider_wolf_reproduction_rate.perform(self.window)
 
             text_bg_surf = pygame.Surface((self.width_scale * 3, self.height_scale * 1.5))
             modified_N = slider_N.get_scaled_value()
@@ -442,14 +447,22 @@ class SettingsMenu(Plot):
                                           "Wolves: " + str(modified_wolves_no), bg=False)
             text_wolves.render()
 
-            slider_reproduction_rate.set_default_range(0, 1)
-            modified_reproduction_chances = slider_reproduction_rate.get_scaled_value(decimal=True)
-            text_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_reproduction_rate.start_x + slider_width * 1.1, slider_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
-                                          "Rabbit Reproduction Chances: " + str(modified_reproduction_chances / 100), bg=False)
-            text_reproduction_chances.render()
+            slider_rabbit_reproduction_rate.set_default_range(0, 1)
+            rabbit_modified_reproduction_chances = slider_rabbit_reproduction_rate.get_scaled_value(decimal=True)
+            text_rabbit_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+                                          slider_rabbit_reproduction_rate.start_x + slider_width * 1.1, slider_rabbit_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
+                                          "Rabbit Reproduction Chances: " + str(rabbit_modified_reproduction_chances / 100), bg=False)
+            text_rabbit_reproduction_chances.render()
 
-            cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.reproduction_chances = modified_N, modified_rabbits_no, modified_wolves_no, modified_reproduction_chances
+            slider_wolf_reproduction_rate.set_default_range(0, 1)
+            wolf_modified_reproduction_chances = slider_wolf_reproduction_rate.get_scaled_value(decimal=True)
+            text_wolf_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+                                          slider_wolf_reproduction_rate.start_x + slider_width * 1.1, slider_wolf_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
+                                          "Wolf Reproduction Chances: " + str(wolf_modified_reproduction_chances / 100), bg=False)
+            text_wolf_reproduction_chances.render()
+
+            cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \
+                = modified_N, modified_rabbits_no, modified_wolves_no, rabbit_modified_reproduction_chances, wolf_modified_reproduction_chances
             cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
 
             start_button.render(self.window)

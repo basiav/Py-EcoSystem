@@ -23,28 +23,32 @@ def find_neighbour_rabbit(x, y):
     return False
 
 
+def find_neighbour_wolf_female(x, y):
+    for i in range(0, len(x_dirs) - 1):
+        new_x, new_y = x + x_dirs[i], y + y_dirs[i]
+        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is Animals.Wolf_Female:
+            return x + x_dirs[i], y + y_dirs[i]
+    return False
+
+
 class Animal(Thread):
     def __init__(self, x, y, identity):
         self.x = x
         self.y = y
         self.identity = identity
-        # config.terrain[x][y] = self.identity
         set_terrain_value(x, y, self.identity)
         Thread.__init__(self)
 
     def make_move(self, destination_x, destination_y):
-        # config.terrain[self.x][self.y] = None
         set_terrain_value(self.x, self.y, None)
         self.x = destination_x
         self.y = destination_y
-        # config.terrain[self.x][self.y] = self.identity
         set_terrain_value(self.x, self.y, self.identity)
 
 
 class Rabbit(Animal):
     def __init__(self, x, y):
         super().__init__(x, y, Animals.Rabbit)
-        # config.stats['rabbits'] += 1
         set_stats('rabbits', 1)
 
     def check_if_alive(self):
@@ -53,9 +57,7 @@ class Rabbit(Animal):
     def run(self):
         while True:
             if not self.check_if_alive():
-                # config.terrain[self.x][self.y] = None
                 set_terrain_value(self.x, self.y, None)
-                # config.stats['rabbits'] -= 1
                 set_stats('rabbits', -1)
                 break
 
@@ -67,7 +69,7 @@ class Rabbit(Animal):
             if (not check_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
                 continue
 
-            if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.reproduction_chances:
+            if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.rabbit_reproduction_chances:
 
                 # Rabbits won't reproduce unless there's at lest one free field around
                 check = check_overpopulation(nx, ny)
@@ -75,9 +77,7 @@ class Rabbit(Animal):
                     new_rabbit = Rabbit(check[0], check[1])
                     new_rabbit.start()
 
-            # elif config.terrain[nx][ny] is None:
-            #    self.make_move(nx, ny)
-            else:
+            elif config.terrain[nx][ny] is None:
                 self.make_move(nx, ny)
 
 
@@ -87,10 +87,8 @@ class Wolf(Animal):
         super().__init__(x, y, identity)
         self.energy = 10
         if self.identity == Animals.Wolf_Female:
-            # config.stats['wolves_females'] += 1
             set_stats('wolves_females', 1)
         elif self.identity == Animals.Wolf_Male:
-            # config.stats['wolves_males'] += 1
             set_stats('wolves_males', 1)
 
     def check_if_alive(self):
@@ -102,38 +100,50 @@ class Wolf(Animal):
     def decrease_energy(self):
         self.energy = self.energy - 0.1 if self.energy > 0 else 0
 
+    def opposite(self):
+        if self.identity == Animals.Wolf_Female:
+            return Animals.Wolf_Male
+        elif self.identity == Animals.Wolf_Male:
+            return Animals.Wolf_Female
+        else:
+            return None
+
     def run(self):
         while True:
             if not self.check_if_alive():
-                # config.terrain[self.x][self.y] = None
                 set_terrain_value(self.x, self.y, None)
                 if self.identity == Animals.Wolf_Female:
-                    # config.stats['wolves_females'] -= 1
                     set_stats('wolves_females', -1)
                 elif self.identity == Animals.Wolf_Male:
-                    # config.stats['wolves_males'] -= 1
                     set_stats('wolves_males', -1)
                 break
 
             time.sleep(sleep_time)
 
             neighbour_rabbit = find_neighbour_rabbit(self.x, self.y)
+            neighbour_wolf_female = find_neighbour_wolf_female(self.x, self.y)
 
             if not neighbour_rabbit:
-                nx = self.x + random.randint(-1, 1)
-                ny = self.y + random.randint(-1, 1)
-                if not check_boundaries(nx, ny):
-                    continue
+                if self.identity == Animals.Wolf_Male and neighbour_wolf_female is not False:
+                    nx, ny = neighbour_wolf_female[0], neighbour_wolf_female[1]
 
-                if config.terrain[nx][ny] == self.identity:
-                    # break  # królik ginie
-                    # w = Wolf(nx, ny)
-                    # w.start()
-                    # pass
-                    pass
+                else:
+                    nx = self.x + random.randint(-1, 1)
+                    ny = self.y + random.randint(-1, 1)
+                    if not check_boundaries(nx, ny):
+                        continue
 
-                self.make_move(nx, ny)
-                self.decrease_energy()
+                if config.terrain[nx][ny] == self.opposite() and self.opposite() is not None:
+
+                    # Wolves won't reproduce unless there's at lest one free field around
+                    check = check_overpopulation(nx, ny)
+                    if check and random.randint(1, 100) < config.wolf_reproduction_chances:
+                        new_wolf = Wolf(check[0], check[1])
+                        new_wolf.start()
+
+                elif config.terrain[nx][ny] is None:
+                    self.make_move(nx, ny)
+                    self.decrease_energy()
 
             else:
                 self.make_move(neighbour_rabbit[0], neighbour_rabbit[1])
