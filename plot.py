@@ -240,14 +240,14 @@ class PlotPhotos(Plot):
                 self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
                 # Display rabbits
-                if cfg.wyspa[i][j] == Animals.Rabbit:
+                if cfg.terrain[i][j] == Animals.Rabbit:
                     self.window.blit(self.rabbit, (i * self.width_scale, j * self.height_scale))
 
                 # Display wolves
-                if cfg.wyspa[i][j] == Animals.Wolf_Male:
+                if cfg.terrain[i][j] == Animals.Wolf_Male:
                     self.window.blit(self.wolf_male, (i * self.width_scale, j * self.height_scale))
 
-                if cfg.wyspa[i][j] == Animals.Wolf_Female:
+                if cfg.terrain[i][j] == Animals.Wolf_Female:
                     self.window.blit(self.wolf_female, (i * self.width_scale, j * self.height_scale))
 
         self.render_plot(plot_img, canvas, self)
@@ -450,7 +450,7 @@ class SettingsMenu(Plot):
             text_reproduction_chances.render()
 
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.reproduction_chances = modified_N, modified_rabbits_no, modified_wolves_no, modified_reproduction_chances
-            cfg.wyspa = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
+            cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
 
             start_button.render(self.window)
             self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 0.99))
@@ -527,11 +527,11 @@ class TilesPlot(Plot):
                 pygame.draw.rect(surface, (0, 0, 0), surface.get_rect())
                 self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
-                if cfg.wyspa[i][j] == Animals.Rabbit:
+                if cfg.terrain[i][j] == Animals.Rabbit:
                     pygame.draw.rect(surface_rabbit, COL3, surface_rabbit.get_rect())
                     self.window.blit(surface_rabbit, (i * self.width_scale, j * self.height_scale))
 
-                if cfg.wyspa[i][j] == Animals.Wolf:
+                if cfg.terrain[i][j] == Animals.Wolf:
                     pygame.draw.rect(surface_wolf, COL2, surface_wolf.get_rect())
                     self.window.blit(surface_wolf, (i * self.width_scale, j * self.height_scale))
 

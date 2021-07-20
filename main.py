@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-import plot
-from common import pygame, plt
+from common import pygame, plt, Lock
 from animals import *
 from plot import PlotPhotos, StartMenu
 import config

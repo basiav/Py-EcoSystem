@@ -1,4 +1,5 @@
-from threading import Thread, active_count
+import threading
+from threading import Thread, active_count, Lock
 import time
 import random
 import os
@@ -6,12 +7,17 @@ import pygame
 import pygame.freetype as pf
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use("Agg")
-import matplotlib.backends.backend_agg as agg
-from matplotlib.figure import Figure
 
 from enum import Enum
 import config as cfg
+
+import matplotlib.backends.backend_agg as agg
+from matplotlib.figure import Figure
+matplotlib.use("Agg")
+
+
+terrain_lock = Lock()
+stats_lock = Lock()
 
 
 class Animals(Enum):
@@ -23,3 +29,15 @@ class Animals(Enum):
 
 def check_boundaries(x, y):
     return 0 <= x < cfg.N and 0 <= y < cfg.N
+
+
+def set_terrain_value(x, y, value):
+    global terrain_lock
+    with terrain_lock:
+        cfg.terrain[x][y] = value
+
+
+def set_stats(animal_species, value):
+    global stats_lock
+    with stats_lock:
+        cfg.stats[animal_species] += value

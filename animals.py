@@ -1,4 +1,4 @@
-from common import Thread, Animals, time, random, check_boundaries
+from common import Thread, Animals, time, random, check_boundaries, set_terrain_value, set_stats
 import config
 
 sleep_time = 0.2
@@ -10,7 +10,7 @@ y_dirs = [1, 1, 0, -1, -1, -1, 0, 1]
 def check_overpopulation(x, y):
     for i in range(0, len(x_dirs) - 1):
         new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.wyspa[new_x][new_y] is None:
+        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is None:
             return x + x_dirs[i], y + y_dirs[i]
     return False
 
@@ -18,7 +18,7 @@ def check_overpopulation(x, y):
 def find_neighbour_rabbit(x, y):
     for i in range(0, len(x_dirs) - 1):
         new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.wyspa[new_x][new_y] is Animals.Rabbit:
+        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is Animals.Rabbit:
             return x + x_dirs[i], y + y_dirs[i]
     return False
 
@@ -28,29 +28,35 @@ class Animal(Thread):
         self.x = x
         self.y = y
         self.identity = identity
-        config.wyspa[x][y] = self.identity
+        # config.terrain[x][y] = self.identity
+        set_terrain_value(x, y, self.identity)
         Thread.__init__(self)
 
     def make_move(self, destination_x, destination_y):
-        config.wyspa[self.x][self.y] = None
+        # config.terrain[self.x][self.y] = None
+        set_terrain_value(self.x, self.y, None)
         self.x = destination_x
         self.y = destination_y
-        config.wyspa[self.x][self.y] = self.identity
+        # config.terrain[self.x][self.y] = self.identity
+        set_terrain_value(self.x, self.y, self.identity)
 
 
 class Rabbit(Animal):
     def __init__(self, x, y):
         super().__init__(x, y, Animals.Rabbit)
-        config.stats['rabbits'] += 1
+        # config.stats['rabbits'] += 1
+        set_stats('rabbits', 1)
 
     def check_if_alive(self):
-        return config.wyspa[self.x][self.y] == Animals.Rabbit
+        return config.terrain[self.x][self.y] == Animals.Rabbit
 
     def run(self):
         while True:
             if not self.check_if_alive():
-                config.wyspa[self.x][self.y] = None
-                config.stats['rabbits'] -= 1
+                # config.terrain[self.x][self.y] = None
+                set_terrain_value(self.x, self.y, None)
+                # config.stats['rabbits'] -= 1
+                set_stats('rabbits', -1)
                 break
 
             time.sleep(sleep_time)
@@ -61,7 +67,7 @@ class Rabbit(Animal):
             if (not check_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
                 continue
 
-            if config.wyspa[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.reproduction_chances:
+            if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.reproduction_chances:
 
                 # Rabbits won't reproduce unless there's at lest one free field around
                 check = check_overpopulation(nx, ny)
@@ -69,7 +75,9 @@ class Rabbit(Animal):
                     new_rabbit = Rabbit(check[0], check[1])
                     new_rabbit.start()
 
-            elif config.wyspa[nx][ny] is None:
+            # elif config.terrain[nx][ny] is None:
+            #    self.make_move(nx, ny)
+            else:
                 self.make_move(nx, ny)
 
 
@@ -79,9 +87,11 @@ class Wolf(Animal):
         super().__init__(x, y, identity)
         self.energy = 10
         if self.identity == Animals.Wolf_Female:
-            config.stats['wolves_females'] += 1
+            # config.stats['wolves_females'] += 1
+            set_stats('wolves_females', 1)
         elif self.identity == Animals.Wolf_Male:
-            config.stats['wolves_males'] += 1
+            # config.stats['wolves_males'] += 1
+            set_stats('wolves_males', 1)
 
     def check_if_alive(self):
         return self.energy > 0
@@ -95,11 +105,14 @@ class Wolf(Animal):
     def run(self):
         while True:
             if not self.check_if_alive():
-                config.wyspa[self.x][self.y] = None
+                # config.terrain[self.x][self.y] = None
+                set_terrain_value(self.x, self.y, None)
                 if self.identity == Animals.Wolf_Female:
-                    config.stats['wolves_females'] -= 1
+                    # config.stats['wolves_females'] -= 1
+                    set_stats('wolves_females', -1)
                 elif self.identity == Animals.Wolf_Male:
-                    config.stats['wolves_males'] -= 1
+                    # config.stats['wolves_males'] -= 1
+                    set_stats('wolves_males', -1)
                 break
 
             time.sleep(sleep_time)
@@ -112,7 +125,7 @@ class Wolf(Animal):
                 if not check_boundaries(nx, ny):
                     continue
 
-                if config.wyspa[nx][ny] == self.identity:
+                if config.terrain[nx][ny] == self.identity:
                     # break  # królik ginie
                     # w = Wolf(nx, ny)
                     # w.start()
