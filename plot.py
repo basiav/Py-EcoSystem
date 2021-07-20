@@ -53,14 +53,14 @@ class GUIElements:
             if decimal:
                 res = int((self.min + (self.max - self.min) * (
                         self.scroll_x_center - self.start_x) / (
-                           self.width) * 10))
+                               self.width) * 10))
                 if res == 10:
                     return res / 10 * 100
                 return (res % 10) / 10 * 100
 
             return self.min + (self.max - self.min) * (
-                        self.scroll_x_center - self.start_x) // (
-                             self.width)
+                    self.scroll_x_center - self.start_x) // (
+                       self.width)
 
         def perform(self, window):
             scroll_rect_width, scroll_rect_height = self.width // 22, self.height * 5
@@ -138,10 +138,12 @@ class GUIElements:
 
             if render_text:
                 text_width, text_height = font.size(text)
-                centered_start_positions = [self.start_x + self.width / 2 - text_width / 2, self.start_y + self.height / 2 - text_height / 2]
+                centered_start_positions = [self.start_x + self.width / 2 - text_width / 2,
+                                            self.start_y + self.height / 2 - text_height / 2]
                 text_line = GUIElements.TextLine(font, plot, font_colour, centered_start_positions[0],
                                                  centered_start_positions[1], None, text,
-                                                 text_shadow_colour=(255, 255, 255), bg_colour=(0, 0, 0), bg=False, shadow=False)
+                                                 text_shadow_colour=(255, 255, 255), bg_colour=(0, 0, 0), bg=False,
+                                                 shadow=False)
                 text_line.render()
 
             if self.highlight_colour:
@@ -286,6 +288,29 @@ class StartMenu(Plot):
         pygame.quit()
 
     def update(self):
+        settings_button_dims = (200, 200)
+        settings_button_pos = (self.width // 2 - settings_button_dims[1], self.height // 4)
+        settings_button_active_colour = (100, 100, 0)
+        settings_button_highlight_colour = (255, 255, 255)
+        settings_button = GUIElements.Button(settings_button_pos, settings_button_dims,
+                                             settings_button_active_colour,
+                                             settings_button_highlight_colour)
+        settings_img = pygame.image.load('resources/go_to_settings.png')
+        settings_img_scaled = pygame.transform.scale(settings_img,
+                                                     (settings_button_dims[0], (int(settings_button_dims[
+                                                                                        0] * settings_img.get_height() // settings_img.get_width()))))
+
+        start_button_dims = (200, 200)
+        start_button_pos = (self.width // 2, settings_button_pos[1] + settings_button_dims[1])
+        start_button_active_colour = (100, 100, 0)
+        start_button_highlight_colour = (255, 255, 255)
+        start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
+                                          start_button_highlight_colour)
+        start_sim_img = pygame.image.load('resources/start_sim_def_params.png')
+        start_sim_img_scaled = pygame.transform.scale(start_sim_img,
+                                                      (start_button_dims[0], (int(start_button_dims[
+                                                                                      0] * start_sim_img.get_height() // start_sim_img.get_width()))))
+
         while not self.start_game:
             pygame.time.delay(1)
 
@@ -294,31 +319,13 @@ class StartMenu(Plot):
             self.window.blit(self.bg, (0, 0))
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
-
             click = False
-            start_button_pos = (300, 300)
-            start_button_dims = (200, 100)
-            start_button_active_colour = (100, 100, 0)
-            start_button_highlight_colour = (255, 255, 255)
-            start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
-                                              start_button_highlight_colour)
-            start_button.render(self.window)
-            start_sim_img = pygame.image.load('resources/start_sim_def_params.png')
-            start_sim_img_scaled = pygame.transform.scale(start_sim_img,
-                                                          (start_button_dims[0], (int(start_button_dims[0] * start_sim_img.get_height() // start_sim_img.get_width()))))
-            self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.05))
 
-            settings_button_pos = (100, 100)
-            settings_button_dims = (200, 200)
-            settings_button_active_colour = (100, 100, 0)
-            settings_button_highlight_colour = (255, 255, 255)
-            settings_button = GUIElements.Button(settings_button_pos, settings_button_dims, settings_button_active_colour,
-                                              settings_button_highlight_colour)
             settings_button.render(self.window)
-            settings_img = pygame.image.load('resources/go_to_settings.png')
-            settings_img_scaled = pygame.transform.scale(settings_img,
-                                                          (settings_button_dims[0], (int(settings_button_dims[0] * settings_img.get_height() // settings_img.get_width()))))
-            self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.5))
+            self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.3))
+
+            start_button.render(self.window)
+            self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.15))
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -366,11 +373,11 @@ class SettingsMenu(Plot):
         slider_colour = "#3e4444"
         default_N = 10
 
-        N_slider_x, N_slider_y = 100, 100
-        rabbits_no_slider_x, rabbits_no_slider_y = 100, 200
-        wolves_no_slider_x, wolves_no_slider_y = 100, 300
-        rabbit_reproduction_rate_slider_x, rabbit_reproduction_rate_slider_y = 100, 400
-        wolf_reproduction_rate_slider_x, wolf_reproduction_rate_slider_y = 100, 500
+        N_slider_x, N_slider_y = 100, self.height * 0.2
+        rabbits_no_slider_x, rabbits_no_slider_y = 100, N_slider_y + 50
+        wolves_no_slider_x, wolves_no_slider_y = 100, rabbits_no_slider_y + 50
+        rabbit_reproduction_rate_slider_x, rabbit_reproduction_rate_slider_y = 100, wolves_no_slider_y + 50
+        wolf_reproduction_rate_slider_x, wolf_reproduction_rate_slider_y = 100, rabbit_reproduction_rate_slider_y + 50
 
         slider_N = GUIElements.Slider(N_slider_x, N_slider_y, slider_width, slider_height, slider_colour)
         slider_rabbits = GUIElements.Slider(rabbits_no_slider_x, rabbits_no_slider_y, slider_width, slider_height,
@@ -378,35 +385,39 @@ class SettingsMenu(Plot):
         slider_wolves = GUIElements.Slider(wolves_no_slider_x, wolves_no_slider_y, slider_width, slider_height,
                                            slider_colour)
         slider_rabbit_reproduction_rate = GUIElements.Slider(rabbit_reproduction_rate_slider_x,
-                                                      rabbit_reproduction_rate_slider_y, slider_width, slider_height,
-                                                      slider_colour)
+                                                             rabbit_reproduction_rate_slider_y, slider_width,
+                                                             slider_height,
+                                                             slider_colour)
         slider_wolf_reproduction_rate = GUIElements.Slider(wolf_reproduction_rate_slider_x,
-                                                      wolf_reproduction_rate_slider_y, slider_width, slider_height,
-                                                      slider_colour)
+                                                           wolf_reproduction_rate_slider_y, slider_width, slider_height,
+                                                           slider_colour)
 
         slider_N.set_default_range(default_N, default_N * 10)
 
         start_button_dims = (200, 70)
         start_button_pos = (self.window.get_width() // 2 + start_button_dims[0] // 4,
-                            (rabbit_reproduction_rate_slider_y + start_button_dims[1]))
+                            (wolf_reproduction_rate_slider_y + start_button_dims[1]))
         start_button_active_colour = (100, 100, 0)
         start_button_highlight_colour = (255, 255, 255)
         start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
                                           start_button_highlight_colour)
         start_sim_img = pygame.image.load('resources/save_and_start_simulation.png')
         start_sim_img_scaled = pygame.transform.scale(start_sim_img,
-                                                      (start_button_dims[0], (int(start_button_dims[0] * start_sim_img.get_height() // start_sim_img.get_width()))))
+                                                      (start_button_dims[0], (int(start_button_dims[
+                                                                                      0] * start_sim_img.get_height() // start_sim_img.get_width()))))
 
         start_menu_button_dims = (200, 70)
         start_menu_button_pos = (self.window.get_width() // 4 - start_button_dims[0] // 2,
-                            (rabbit_reproduction_rate_slider_y + start_button_dims[1]))
+                                 (wolf_reproduction_rate_slider_y + start_button_dims[1]))
         start_menu_button_active_colour = (100, 100, 0)
         start_menu_button_highlight_colour = (255, 255, 255)
-        start_menu_button = GUIElements.Button(start_menu_button_pos, start_menu_button_dims, start_menu_button_active_colour,
-                                          start_menu_button_highlight_colour)
+        start_menu_button = GUIElements.Button(start_menu_button_pos, start_menu_button_dims,
+                                               start_menu_button_active_colour,
+                                               start_menu_button_highlight_colour)
         back_to_start_menu_img = pygame.image.load('resources/back_to_start_menu.png')
         back_to_start_menu_img_scaled = pygame.transform.scale(back_to_start_menu_img,
-                                                      (start_menu_button_dims[0], (int(start_menu_button_dims[0] * back_to_start_menu_img.get_height() // back_to_start_menu_img.get_width()))))
+                                                               (start_menu_button_dims[0], (int(start_menu_button_dims[
+                                                                                                    0] * back_to_start_menu_img.get_height() // back_to_start_menu_img.get_width()))))
 
         while not self.settings_ready:
             pygame.time.delay(1)
@@ -429,36 +440,51 @@ class SettingsMenu(Plot):
             text_bg_surf = pygame.Surface((self.width_scale * 3, self.height_scale * 1.5))
             modified_N = slider_N.get_scaled_value()
             text_N = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_N.start_x + slider_width * 1.1, N_slider_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
+                                          slider_N.start_x + slider_width * 1.1,
+                                          N_slider_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
                                           "N: " + str(modified_N), bg=False)
             text_N.render()
 
             slider_rabbits.set_default_range(0, (1 * modified_N) // 2)
             modified_rabbits_no = slider_rabbits.get_scaled_value()
             text_rabbits = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_rabbits.start_x + slider_width * 1.1, slider_rabbits.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
-                                          "Rabbits: " + str(modified_rabbits_no), bg=False)
+                                                slider_rabbits.start_x + slider_width * 1.1,
+                                                slider_rabbits.start_y - slider_height * 5 // 2 + slider_height // 2,
+                                                text_bg_surf,
+                                                "Rabbits: " + str(modified_rabbits_no), bg=False)
             text_rabbits.render()
 
             slider_wolves.set_default_range(0, (1 * modified_N) // 2)
             modified_wolves_no = slider_wolves.get_scaled_value()
             text_wolves = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_wolves.start_x + slider_width * 1.1, slider_wolves.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
-                                          "Wolves: " + str(modified_wolves_no), bg=False)
+                                               slider_wolves.start_x + slider_width * 1.1,
+                                               slider_wolves.start_y - slider_height * 5 // 2 + slider_height // 2,
+                                               text_bg_surf,
+                                               "Wolves: " + str(modified_wolves_no), bg=False)
             text_wolves.render()
 
             slider_rabbit_reproduction_rate.set_default_range(0, 1)
             rabbit_modified_reproduction_chances = slider_rabbit_reproduction_rate.get_scaled_value(decimal=True)
-            text_rabbit_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_rabbit_reproduction_rate.start_x + slider_width * 1.1, slider_rabbit_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
-                                          "Rabbit Reproduction Chances: " + str(rabbit_modified_reproduction_chances / 100), bg=False)
+            text_rabbit_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self,
+                                                                    (255, 255, 255),
+                                                                    slider_rabbit_reproduction_rate.start_x + slider_width * 1.1,
+                                                                    slider_rabbit_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2,
+                                                                    text_bg_surf,
+                                                                    "Rabbit Reproduction Chances: " + str(
+                                                                        rabbit_modified_reproduction_chances / 100),
+                                                                    bg=False)
             text_rabbit_reproduction_chances.render()
 
             slider_wolf_reproduction_rate.set_default_range(0, 1)
             wolf_modified_reproduction_chances = slider_wolf_reproduction_rate.get_scaled_value(decimal=True)
-            text_wolf_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
-                                          slider_wolf_reproduction_rate.start_x + slider_width * 1.1, slider_wolf_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
-                                          "Wolf Reproduction Chances: " + str(wolf_modified_reproduction_chances / 100), bg=False)
+            text_wolf_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self,
+                                                                  (255, 255, 255),
+                                                                  slider_wolf_reproduction_rate.start_x + slider_width * 1.1,
+                                                                  slider_wolf_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2,
+                                                                  text_bg_surf,
+                                                                  "Wolf Reproduction Chances: " + str(
+                                                                      wolf_modified_reproduction_chances / 100),
+                                                                  bg=False)
             text_wolf_reproduction_chances.render()
 
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \

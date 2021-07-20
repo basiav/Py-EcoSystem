@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 
 
 def create_start_menu():
-    return StartMenu(700, 700)
+    return StartMenu(800, 700)
 
 
 def start_simulation():
