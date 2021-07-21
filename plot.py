@@ -199,6 +199,7 @@ class PlotPhotos(Plot):
         window = pygame.display.set_mode(flags=pygame.RESIZABLE)
         super().__init__(window, window.get_width() * 3 // 4, window.get_height())
         self.running = True
+        self.pause = False
 
         pygame.init()
         pygame.font.init()
@@ -220,11 +221,10 @@ class PlotPhotos(Plot):
     def update(self, plot_img, canvas):
         pygame.time.delay(1)
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
-                self.running = False
-
         self.window.blit(self.bg, (0, 0))
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        click = False
 
         # Settings
         COL1 = "#587e76"
@@ -258,9 +258,29 @@ class PlotPhotos(Plot):
 
         self.render_text(pygame.font.SysFont('arial', 20), self)
 
-        pygame.display.update()
+        #pause_button.render(self.window)
+        #self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.3))
 
-    pygame.quit()
+        #escape_button.render(self.window)
+        #self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.15))
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                if e.button == 1:
+                    click = True
+
+        #if click:
+            #if pause_button.collidepoint(mouse_x, mouse_y):
+            #    print("[PLOT] pausing simulation...")
+            #    self.pause = True
+
+            #elif escape_button.collidepoint(mouse_x, mouse_y):
+            #    print("[PLOT] escape button has just been pressed...")
+                #TODO
+
+        pygame.display.update()
 
 
 class StartMenu(Plot):

@@ -1,5 +1,5 @@
 import threading
-from threading import Thread, active_count, Lock
+from threading import Thread, active_count, Lock, Event
 import time
 import random
 import os
@@ -18,6 +18,8 @@ matplotlib.use("Agg")
 
 terrain_lock = Lock()
 stats_lock = Lock()
+
+can_run = Event()
 
 
 class Animals(Enum):

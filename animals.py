@@ -1,5 +1,6 @@
 from common import Thread, Animals, time, random, check_boundaries, set_terrain_value, set_stats
 import config
+import common
 
 sleep_time = 0.2
 
@@ -15,18 +16,10 @@ def check_overpopulation(x, y):
     return False
 
 
-def find_neighbour_rabbit(x, y):
+def find_neighbour(x, y, animal):
     for i in range(0, len(x_dirs) - 1):
         new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is Animals.Rabbit:
-            return x + x_dirs[i], y + y_dirs[i]
-    return False
-
-
-def find_neighbour_wolf_female(x, y):
-    for i in range(0, len(x_dirs) - 1):
-        new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is Animals.Wolf_Female:
+        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] == animal:
             return x + x_dirs[i], y + y_dirs[i]
     return False
 
@@ -56,6 +49,7 @@ class Rabbit(Animal):
 
     def run(self):
         while True:
+            common.can_run.wait()
             if not self.check_if_alive():
                 set_terrain_value(self.x, self.y, None)
                 set_stats('rabbits', -1)
@@ -110,6 +104,7 @@ class Wolf(Animal):
 
     def run(self):
         while True:
+            common.can_run.wait()
             if not self.check_if_alive():
                 set_terrain_value(self.x, self.y, None)
                 if self.identity == Animals.Wolf_Female:
@@ -120,8 +115,8 @@ class Wolf(Animal):
 
             time.sleep(sleep_time)
 
-            neighbour_rabbit = find_neighbour_rabbit(self.x, self.y)
-            neighbour_wolf_female = find_neighbour_wolf_female(self.x, self.y)
+            neighbour_rabbit = find_neighbour(self.x, self.y, Animals.Rabbit)
+            neighbour_wolf_female = find_neighbour(self.x, self.y, Animals.Wolf_Female)
 
             if not neighbour_rabbit:
                 if self.identity == Animals.Wolf_Male and neighbour_wolf_female is not False:

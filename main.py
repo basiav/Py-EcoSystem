@@ -1,5 +1,8 @@
 #!/usr/bin/python3
+import threading
+
 from common import pygame, plt, Lock
+import common
 from animals import *
 from plot import PlotPhotos, StartMenu
 import config
@@ -51,8 +54,10 @@ def start_simulation():
     plt.xlim(0, 1)
     plt.ylim(0, 20)
 
+    common.can_run.set()
+
     once = False
-    while plot.running:
+    while plot.running or not plot.pause:
         minimum = min(wolf_no, rabbit_no)
         image = create_bar_img()
 
@@ -84,7 +89,10 @@ def start_simulation():
 
         plot.update(image, canvas)
 
-    pygame.quit()
+        if plot.pause and common.can_run.is_set():
+            common.can_run.clear()
+        if not plot.pause and not common.can_run.is_set():
+            common.can_run.set()
 
 
 def main():
