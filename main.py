@@ -87,6 +87,10 @@ def start_simulation():
 
             once = True
 
+        if plot.quit:
+            plot.quit_plot()
+            break
+
         plot.update(image, canvas)
 
         if plot.pause and common.can_run.is_set():
@@ -94,18 +98,26 @@ def start_simulation():
         if not plot.pause and not common.can_run.is_set():
             common.can_run.set()
 
+    print("Simulation ended")
+
 
 def main():
     start_menu = create_start_menu()
 
-    while not start_menu.start_game:
+    # while not start_menu.start_game:
+    #    start_menu.update()
+
+    while not start_menu.quit:
+
         start_menu.update()
-
-    print("[MAIN] Going to start game!")
-    start_menu.quit_start_menu()
-
-    print("Game:")
-    start_simulation()
+        if start_menu.start_game:
+            # print("[MAIN] Going to start game!")
+            # print("Game:")
+            print("Starting Game!")
+            start_simulation()
+        if not start_menu.start_game and not start_menu.quit:
+            start_menu = create_start_menu()
+            config.get_default_settings()
 
 
 if __name__ == '__main__':

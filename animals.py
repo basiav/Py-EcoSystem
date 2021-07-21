@@ -26,6 +26,7 @@ def find_neighbour(x, y, animal):
 
 class Animal(Thread):
     def __init__(self, x, y, identity):
+        common.can_run.wait()
         self.x = x
         self.y = y
         self.identity = identity

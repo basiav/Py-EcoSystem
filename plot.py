@@ -172,6 +172,7 @@ class Plot:
         self.tiles = cfg.N
         self.width_scale = self.width // self.tiles
         self.height_scale = self.height // self.tiles
+        self.quit = False
 
     def render_plot(self, plot_img, canvas, plot):
         plot_surface = pygame.image.fromstring(plot_img, canvas.get_width_height(), "RGB")
@@ -192,6 +193,10 @@ class Plot:
 
     def render_legend(self, plot):
         plot.window.blit(plot.legend, (plot.width + abs((plot.window.get_width() - plot.width) // 4), 400))
+
+    def quit_plot(self):
+        self.quit = True
+        pygame.quit()
 
 
 class PlotPhotos(Plot):
@@ -218,6 +223,32 @@ class PlotPhotos(Plot):
         self.agg = agg
         self.legend = create_legend()
 
+    def get_pause_button(self):
+        pause_button_dims = (200, 70)
+        pause_button_pos = (900, 600)
+        pause_button_active_colour = (100, 100, 0)
+        pause_button_highlight_colour = (255, 255, 255)
+        pause_button = GUIElements.Button(pause_button_pos, pause_button_dims, pause_button_active_colour,
+                                          pause_button_highlight_colour)
+        pause_img = pygame.image.load('resources/pause.png')
+        pause_img_scaled = pygame.transform.scale(pause_img,
+                                                      (pause_button_dims[0], (int(pause_button_dims[
+                                                                                      0] * pause_img.get_height() // pause_img.get_width()))))
+        return pause_button, pause_img_scaled
+
+    def get_escape_button(self):
+        escape_button_dims = (200, 70)
+        escape_button_pos = (1000, 600)
+        escape_button_active_colour = (100, 100, 0)
+        escape_button_highlight_colour = (255, 255, 255)
+        escape_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
+                                          escape_button_highlight_colour)
+        escape_img = pygame.image.load('resources/quit.png')
+        escape_img_scaled = pygame.transform.scale(escape_img,
+                                                      (escape_button_dims[0], (int(escape_button_dims[
+                                                                                      0] * escape_img.get_height() // escape_img.get_width()))))
+        return escape_button, escape_img_scaled
+
     def update(self, plot_img, canvas):
         pygame.time.delay(1)
 
@@ -225,6 +256,9 @@ class PlotPhotos(Plot):
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
         click = False
+
+        pause_button, pause_img_scaled = self.get_pause_button()
+        escape_button, escape_img_scaled = self.get_escape_button()
 
         # Settings
         COL1 = "#587e76"
@@ -258,11 +292,11 @@ class PlotPhotos(Plot):
 
         self.render_text(pygame.font.SysFont('arial', 20), self)
 
-        #pause_button.render(self.window)
-        #self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.3))
+        pause_button.render(self.window)
+        self.window.blit(pause_img_scaled, (pause_button.start_x, pause_button.start_y))
 
-        #escape_button.render(self.window)
-        #self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.15))
+        escape_button.render(self.window)
+        self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.15))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -271,14 +305,18 @@ class PlotPhotos(Plot):
                 if e.button == 1:
                     click = True
 
-        #if click:
-            #if pause_button.collidepoint(mouse_x, mouse_y):
-            #    print("[PLOT] pausing simulation...")
-            #    self.pause = True
+        if click:
+            if pause_button.collidepoint(mouse_x, mouse_y) and not self.pause:
+                print("[PLOT] pausing simulation...")
+                self.pause = True
+            elif pause_button.collidepoint(mouse_x, mouse_y) and self.pause:
+                print("[PLOT] resuming simulation...")
+                self.pause = False
 
-            #elif escape_button.collidepoint(mouse_x, mouse_y):
-            #    print("[PLOT] escape button has just been pressed...")
-                #TODO
+            elif escape_button.collidepoint(mouse_x, mouse_y):
+                print("[PLOT] quit simulation button has just been pressed...")
+                self.pause = True
+                self.running = False
 
         pygame.display.update()
 
@@ -304,8 +342,8 @@ class StartMenu(Plot):
         self.wolf_male = pygame.transform.scale(wolf_male_img, (int(self.width_scale), int(self.height_scale)))
         self.wolf_female = pygame.transform.scale(wolf_female_img, (int(self.width_scale), int(self.height_scale)))
 
-    def quit_start_menu(self):
-        pygame.quit()
+    def reenter_start_menu(self):
+        self.quit = False
 
     def update(self):
         settings_button_dims = (200, 200)
@@ -349,7 +387,7 @@ class StartMenu(Plot):
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    pygame.quit()
+                    self.quit = True
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     if e.button == 1:
                         click = True
@@ -359,11 +397,15 @@ class StartMenu(Plot):
                     print("[START MENU] start_game has just been clicked!")
                     print_settings()
                     self.start_game = True
+                    self.quit_plot()
 
                 elif settings_button.collidepoint(mouse_x, mouse_y):
                     print("[START MENU] going to settings...")
                     settings_menu = SettingsMenu(self.window, self)
                     settings_menu.update()
+
+            if self.quit:
+                break
 
             pygame.display.update()
 
@@ -519,7 +561,8 @@ class SettingsMenu(Plot):
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    pygame.quit()
+                    self.quit_plot()
+                    self.start_menu.quit_plot()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     if e.button == 1:
                         click = True
@@ -536,6 +579,9 @@ class SettingsMenu(Plot):
                     self.settings_ready = True
                     cfg.get_default_settings()
                     self.start_menu.update()
+
+            if self.quit:
+                break
 
             pygame.display.update()
 
