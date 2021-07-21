@@ -224,7 +224,7 @@ class PlotPhotos(Plot):
         self.legend = create_legend()
 
     def get_pause_button(self):
-        pause_button_dims = (200, 70)
+        pause_button_dims = (70, 70)
         pause_button_pos = (900, 600)
         pause_button_active_colour = (100, 100, 0)
         pause_button_highlight_colour = (255, 255, 255)
@@ -237,7 +237,7 @@ class PlotPhotos(Plot):
         return pause_button, pause_img_scaled
 
     def get_escape_button(self):
-        escape_button_dims = (200, 70)
+        escape_button_dims = (70, 70)
         escape_button_pos = (1000, 600)
         escape_button_active_colour = (100, 100, 0)
         escape_button_highlight_colour = (255, 255, 255)
@@ -397,19 +397,21 @@ class StartMenu(Plot):
                     print("[START MENU] start_game has just been clicked!")
                     print_settings()
                     self.start_game = True
-                    self.quit_plot()
+                    # self.quit_plot()
+                    pygame.quit()
 
                 elif settings_button.collidepoint(mouse_x, mouse_y):
                     print("[START MENU] going to settings...")
                     settings_menu = SettingsMenu(self.window, self)
                     settings_menu.update()
 
-            if self.quit:
+            if self.quit or self.start_game:
                 break
 
             pygame.display.update()
 
-    # pygame.quit()
+        if self.start_game:
+            pygame.quit()
 
 
 class SettingsMenu(Plot):

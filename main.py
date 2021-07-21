@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import threading
 
+import plot
 from common import pygame, plt, Lock
 import common
 from animals import *
@@ -55,6 +56,7 @@ def start_simulation():
     plt.ylim(0, 20)
 
     common.can_run.set()
+    common.terminate_threads.clear()
 
     once = False
     while plot.running or not plot.pause:
@@ -98,27 +100,32 @@ def start_simulation():
         if not plot.pause and not common.can_run.is_set():
             common.can_run.set()
 
+    common.terminate_threads.set()
+    print("Terminate threads: ", common.terminate_threads.is_set())
     print("Simulation ended")
+    return plot
 
 
 def main():
+    common.terminate_threads.set()
+
     start_menu = create_start_menu()
+    escape = start_menu.quit
 
-    # while not start_menu.start_game:
-    #    start_menu.update()
-
-    while not start_menu.quit:
-
+    while not escape:
         start_menu.update()
         if start_menu.start_game:
-            # print("[MAIN] Going to start game!")
-            # print("Game:")
-            print("Starting Game!")
-            start_simulation()
-        if not start_menu.start_game and not start_menu.quit:
+            print("[MAIN] Starting Game!")
+            res = start_simulation()
+            res.quit_plot()
+
+        if not start_menu.quit:
             start_menu = create_start_menu()
             config.get_default_settings()
+
+        escape = start_menu.quit
 
 
 if __name__ == '__main__':
     main()
+    print("Goodbye! :)")

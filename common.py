@@ -20,6 +20,7 @@ terrain_lock = Lock()
 stats_lock = Lock()
 
 can_run = Event()
+terminate_threads = Event()
 
 
 class Animals(Enum):
