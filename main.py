@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 import threading
 
-import plot
-from common import pygame, plt, Lock
-import common
+from common import plt
 from animals import *
-from plot import PlotPhotos, StartMenu
+from gui.plot import PlotPhotos, StartMenu
 import config
 
 import matplotlib
