@@ -183,10 +183,10 @@ class Plot:
         text_bg_surf = pygame.Surface((plot.width_scale * 7, plot.height_scale + 30))
         active_threads_text_line = GUIElements.TextLine(my_font, plot, (255, 255, 255),
                                                         plot.width + abs((plot.window.get_width() - plot.width) // 5),
-                                                        plot.height * 4 // 5, text_bg_surf, active_threads_string())
+                                                        plot.height * 0.7, text_bg_surf, active_threads_string())
         total_animals_text_line = GUIElements.TextLine(my_font, plot, (255, 255, 255),
                                                        plot.width + abs((plot.window.get_width() - plot.width) // 5),
-                                                       plot.height * 4 // 5 + 30, text_bg_surf, total_animals_no(),
+                                                       plot.height * 0.7 + 30, text_bg_surf, total_animals_no(),
                                                        bg=False)
         active_threads_text_line.render()
         total_animals_text_line.render()
@@ -225,8 +225,8 @@ class PlotPhotos(Plot):
         self.legend = create_legend()
 
     def get_pause_button(self):
-        pause_button_dims = (70, 70)
-        pause_button_pos = (900, 600)
+        pause_button_dims = (100, 70)
+        pause_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
         pause_button_active_colour = (100, 100, 0)
         pause_button_highlight_colour = (255, 255, 255)
         pause_button = GUIElements.Button(pause_button_pos, pause_button_dims, pause_button_active_colour,
@@ -237,16 +237,29 @@ class PlotPhotos(Plot):
                                                                                       0] * pause_img.get_height() // pause_img.get_width()))))
         return pause_button, pause_img_scaled
 
+    def get_resume_button(self):
+        resume_button_dims = (100, 70)
+        resume_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
+        resume_button_active_colour = (100, 100, 0)
+        resume_button_highlight_colour = (255, 255, 255)
+        resume_button = GUIElements.Button(resume_button_pos, resume_button_dims, resume_button_active_colour,
+                                          resume_button_highlight_colour)
+        resume_img = pygame.image.load('resources/resume.png')
+        resume_img_scaled = pygame.transform.scale(resume_img,
+                                                      (resume_button_dims[0], (int(resume_button_dims[
+                                                                                      0] * resume_img.get_height() // resume_img.get_width()))))
+        return resume_button, resume_img_scaled
+
     def get_escape_button(self):
-        escape_button_dims = (70, 70)
-        escape_button_pos = (1000, 600)
+        escape_button_dims = (100, 70)
+        escape_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 5), self.height * 0.815)
         escape_button_active_colour = (100, 100, 0)
         escape_button_highlight_colour = (255, 255, 255)
         escape_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
                                           escape_button_highlight_colour)
-        escape_img = pygame.image.load('resources/quit.png')
+        escape_img = pygame.image.load('resources/quit_return.png')
         escape_img_scaled = pygame.transform.scale(escape_img,
-                                                      (escape_button_dims[0], (int(escape_button_dims[
+                                                      (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[
                                                                                       0] * escape_img.get_height() // escape_img.get_width()))))
         return escape_button, escape_img_scaled
 
@@ -259,6 +272,7 @@ class PlotPhotos(Plot):
         click = False
 
         pause_button, pause_img_scaled = self.get_pause_button()
+        resume_button, resume_img_scaled = self.get_resume_button()
         escape_button, escape_img_scaled = self.get_escape_button()
 
         # Settings
@@ -294,10 +308,15 @@ class PlotPhotos(Plot):
         self.render_text(pygame.font.SysFont('arial', 20), self)
 
         pause_button.render(self.window)
-        self.window.blit(pause_img_scaled, (pause_button.start_x, pause_button.start_y))
+
+        if self.pause:
+            self.window.blit(resume_img_scaled, (resume_button.start_x, resume_button.start_y))
+
+        else:
+            self.window.blit(pause_img_scaled, (pause_button.start_x, pause_button.start_y))
 
         escape_button.render(self.window)
-        self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.15))
+        self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:

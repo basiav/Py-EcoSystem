@@ -33,7 +33,7 @@ def terminate_animal_threads():
 
 
 def create_start_menu():
-    return StartMenu(800, 700)
+    return StartMenu(800, 650)
 
 
 def start_simulation():
@@ -132,7 +132,7 @@ def main():
     while not escape:
         start_menu.update()
         if start_menu.start_game:
-            print("[MAIN] Starting Game!")
+            print("[MAIN] Starting simulation!")
             res = start_simulation()
             print("[MAIN] Simulation over")
             res.quit_plot()
