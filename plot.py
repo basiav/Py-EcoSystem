@@ -252,7 +252,7 @@ class PlotPhotos(Plot):
 
     def get_escape_button(self, active_colour):
         escape_button_dims = (105, 70)
-        escape_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 5), self.height * 0.815)
+        escape_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815)
         escape_button_active_colour = active_colour
         escape_button_highlight_colour = (255, 255, 255)
         escape_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
@@ -268,7 +268,7 @@ class PlotPhotos(Plot):
 
         self.window.blit(self.bg, (0, 0))
 
-        # Settings
+        # Colour Settings
         blue_1 = "#587e76"
         blue_2 = "#588c7e"
         dark_raspberry = "#c94c4c"
