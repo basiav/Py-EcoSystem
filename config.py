@@ -1,11 +1,11 @@
 N = 30
 terrain = [[None for _ in range(N)] for _ in range(N)]
 
-rabbit_no = 10
-wolf_no = 1
+rabbit_no = 30
+wolf_no = 20
 
 rabbit_reproduction_chances = 30
-wolf_reproduction_chances = 30
+wolf_reproduction_chances = 10
 
 stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
 stats_arrs = {'rabbits': [], 'wolves_females': [], 'wolves_males': []}
@@ -21,11 +21,11 @@ def set_default_parameters():
     N = 30
     terrain = [[None for _ in range(N)] for _ in range(N)]
 
-    rabbit_no = 10
-    wolf_no = 1
+    rabbit_no = 30
+    wolf_no = 20
 
     rabbit_reproduction_chances = 30
-    wolf_reproduction_chances = 30
+    wolf_reproduction_chances = 10
 
     stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
     stats_arrs = {'rabbits': [], 'wolves_females': [], 'wolves_males': []}
