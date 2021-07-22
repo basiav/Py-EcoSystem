@@ -224,10 +224,10 @@ class PlotPhotos(Plot):
         self.agg = agg
         self.legend = create_legend()
 
-    def get_pause_button(self):
-        pause_button_dims = (100, 70)
+    def get_pause_button(self, active_colour):
+        pause_button_dims = (105, 70)
         pause_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
-        pause_button_active_colour = (100, 100, 0)
+        pause_button_active_colour = active_colour
         pause_button_highlight_colour = (255, 255, 255)
         pause_button = GUIElements.Button(pause_button_pos, pause_button_dims, pause_button_active_colour,
                                           pause_button_highlight_colour)
@@ -237,10 +237,10 @@ class PlotPhotos(Plot):
                                                                                       0] * pause_img.get_height() // pause_img.get_width()))))
         return pause_button, pause_img_scaled
 
-    def get_resume_button(self):
-        resume_button_dims = (100, 70)
+    def get_resume_button(self, active_colour):
+        resume_button_dims = (105, 70)
         resume_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
-        resume_button_active_colour = (100, 100, 0)
+        resume_button_active_colour = active_colour
         resume_button_highlight_colour = (255, 255, 255)
         resume_button = GUIElements.Button(resume_button_pos, resume_button_dims, resume_button_active_colour,
                                           resume_button_highlight_colour)
@@ -250,10 +250,10 @@ class PlotPhotos(Plot):
                                                                                       0] * resume_img.get_height() // resume_img.get_width()))))
         return resume_button, resume_img_scaled
 
-    def get_escape_button(self):
-        escape_button_dims = (100, 70)
+    def get_escape_button(self, active_colour):
+        escape_button_dims = (105, 70)
         escape_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 5), self.height * 0.815)
-        escape_button_active_colour = (100, 100, 0)
+        escape_button_active_colour = active_colour
         escape_button_highlight_colour = (255, 255, 255)
         escape_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
                                           escape_button_highlight_colour)
@@ -268,18 +268,18 @@ class PlotPhotos(Plot):
 
         self.window.blit(self.bg, (0, 0))
 
+        # Settings
+        blue_1 = "#587e76"
+        blue_2 = "#588c7e"
+        dark_raspberry = "#c94c4c"
+        olive = (100, 100, 0)
+
         mouse_x, mouse_y = pygame.mouse.get_pos()
         click = False
 
-        pause_button, pause_img_scaled = self.get_pause_button()
-        resume_button, resume_img_scaled = self.get_resume_button()
-        escape_button, escape_img_scaled = self.get_escape_button()
-
-        # Settings
-        COL1 = "#587e76"
-        COL2 = "#588c7e"
-        COL3 = "#c94c4c"
-        COL4 = "#588c7e"
+        pause_button, pause_img_scaled = self.get_pause_button(olive)
+        resume_button, resume_img_scaled = self.get_resume_button(blue_2)
+        escape_button, escape_img_scaled = self.get_escape_button(olive)
 
         surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
         surface.set_alpha(200)
@@ -287,7 +287,7 @@ class PlotPhotos(Plot):
         for i in range(0, self.tiles):
             for j in range(0, self.tiles):
                 # Display background
-                pygame.draw.rect(surface, COL4, surface.get_rect())
+                pygame.draw.rect(surface, blue_2, surface.get_rect())
                 self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
                 # Display rabbits
@@ -310,13 +310,13 @@ class PlotPhotos(Plot):
         pause_button.render(self.window)
 
         if self.pause:
-            self.window.blit(resume_img_scaled, (resume_button.start_x, resume_button.start_y))
+            self.window.blit(resume_img_scaled, (resume_button.start_x, resume_button.start_y * 1.025))
 
         else:
-            self.window.blit(pause_img_scaled, (pause_button.start_x, pause_button.start_y))
+            self.window.blit(pause_img_scaled, (pause_button.start_x, pause_button.start_y * 1.0125))
 
         escape_button.render(self.window)
-        self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y))
+        self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.0125))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
