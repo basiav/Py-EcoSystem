@@ -582,7 +582,7 @@ class SettingsMenu(Plot):
                     cfg.get_default_settings()
                     self.start_menu.update()
 
-            if self.quit:
+            if self.quit or self.settings_ready:
                 break
 
             pygame.display.update()
