@@ -192,7 +192,8 @@ class Plot:
         total_animals_text_line.render()
 
     def render_legend(self, plot):
-        plot.window.blit(plot.legend, (plot.width + abs((plot.window.get_width() - plot.width) // 4), 400))
+        plot.window.blit(plot.legend, (plot.width + abs((plot.window.get_width() - plot.width) // 4),
+                                       plot.height // 2 * 1.075))
 
     def quit_plot(self):
         self.quit = True
@@ -406,6 +407,8 @@ class StartMenu(Plot):
                     settings_menu.update()
 
             if self.quit or self.start_game:
+                if pygame.get_init():
+                    pygame.quit()
                 break
 
             pygame.display.update()
@@ -579,7 +582,7 @@ class SettingsMenu(Plot):
                 elif start_menu_button.collidepoint(mouse_x, mouse_y):
                     print("[SETTINGS MENU] going back to start menu...")
                     self.settings_ready = True
-                    cfg.get_default_settings()
+                    cfg.set_default_parameters()
                     self.start_menu.update()
 
             if self.quit or self.settings_ready:

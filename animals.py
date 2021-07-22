@@ -52,14 +52,15 @@ class Rabbit(Animal):
         return config.terrain[self.x][self.y] == Animals.Rabbit
 
     def run(self):
-        while True and not common.terminate_threads.is_set():
+        while not common.terminate_threads.is_set():
             common.can_run.wait()
             if not self.check_if_alive():
                 set_terrain_value(self.x, self.y, None)
                 set_stats('rabbits', -1)
                 break
 
-            #if not super(Rabbit, self).check_if_alive():
+            # if not super(Rabbit, self).check_if_alive():
+
             if common.terminate_threads.is_set():
                 break
 
@@ -111,7 +112,7 @@ class Wolf(Animal):
             return None
 
     def run(self):
-        while True and not common.terminate_threads.is_set():
+        while not common.terminate_threads.is_set():
             common.can_run.wait()
             if not self.check_if_alive():
                 set_terrain_value(self.x, self.y, None)
@@ -121,8 +122,9 @@ class Wolf(Animal):
                     set_stats('wolves_males', -1)
                 break
 
-            #if not super(Wolf, self).check_if_alive():
+            # if not super(Wolf, self).check_if_alive():
             #    break
+
             if common.terminate_threads.is_set():
                 break
 

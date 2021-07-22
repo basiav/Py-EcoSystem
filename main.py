@@ -15,6 +15,23 @@ from matplotlib.figure import Figure
 matplotlib.use("Agg")
 
 
+def terminate_animal_threads():
+    # Set terminate_threads Event() flag
+    common.terminate_threads.set()
+
+    if not common.terminate_threads.is_set():
+        raise Exception("[MAIN, start_simulation] ERROR: threading.Event terminate_threads should have been set by now")
+
+    # Join all the Animal threads
+    for thread in threading.enumerate():
+        if thread != threading.main_thread():
+            thread.join()
+
+    if threading.active_count() != 1:
+        raise Exception("[MAIN, start_simulation] ERROR: "
+                        "All threads except for the main one should have been joint by now")
+
+
 def create_start_menu():
     return StartMenu(800, 700)
 
@@ -99,10 +116,10 @@ def start_simulation():
             common.can_run.clear()
         if not plot.pause and not common.can_run.is_set():
             common.can_run.set()
+        if plot.pause and not plot.running:
+            common.can_run.set()
 
-    common.terminate_threads.set()
-    print("Terminate threads: ", common.terminate_threads.is_set())
-    print("Simulation ended")
+    terminate_animal_threads()
     return plot
 
 
@@ -117,15 +134,17 @@ def main():
         if start_menu.start_game:
             print("[MAIN] Starting Game!")
             res = start_simulation()
+            print("[MAIN] Simulation over")
             res.quit_plot()
 
         if not start_menu.quit:
             start_menu = create_start_menu()
-            config.get_default_settings()
+            config.set_default_parameters()
 
         escape = start_menu.quit
+
+    print("[MAIN] Goodbye! :)")
 
 
 if __name__ == '__main__':
     main()
-    print("Goodbye! :)")
