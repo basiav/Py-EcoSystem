@@ -1,6 +1,6 @@
 import config as cfg
-from app.common import pygame
-from app.animals import *
+from common import pygame
+from animals import *
 from gui.gui_elements import GUIElements, active_threads_string, total_animals_no, create_legend, print_settings
 
 
