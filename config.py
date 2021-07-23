@@ -10,6 +10,8 @@ wolf_reproduction_chances = 10
 stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
 stats_arrs = {'rabbits': [], 'wolves_females': [], 'wolves_males': []}
 
+fence = [[False for _ in range(N+1)] for _ in range(N+1)]
+
 
 def get_aliased_global_variable_names():
     global N, terrain, rabbit_no, wolf_no, rabbit_reproduction_chances, wolf_reproduction_chances, stats, stats_arrs
@@ -29,3 +31,5 @@ def set_default_parameters():
 
     stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
     stats_arrs = {'rabbits': [], 'wolves_females': [], 'wolves_males': []}
+
+    fence = [[False for _ in range(N + 1)] for _ in range(N + 1)]

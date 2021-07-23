@@ -73,8 +73,8 @@ class PlotPhotos(Plot):
                                           pause_button_highlight_colour)
         pause_img = pygame.image.load('resources/pause.png')
         pause_img_scaled = pygame.transform.scale(pause_img,
-                                                      (pause_button_dims[0], (int(pause_button_dims[
-                                                                                      0] * pause_img.get_height() // pause_img.get_width()))))
+                                                  (pause_button_dims[0], (int(pause_button_dims[
+                                                                                  0] * pause_img.get_height() // pause_img.get_width()))))
         return pause_button, pause_img_scaled
 
     def get_resume_button(self, active_colour):
@@ -86,8 +86,8 @@ class PlotPhotos(Plot):
                                            resume_button_highlight_colour)
         resume_img = pygame.image.load('resources/resume.png')
         resume_img_scaled = pygame.transform.scale(resume_img,
-                                                      (resume_button_dims[0], (int(resume_button_dims[
-                                                                                      0] * resume_img.get_height() // resume_img.get_width()))))
+                                                   (resume_button_dims[0], (int(resume_button_dims[
+                                                                                    0] * resume_img.get_height() // resume_img.get_width()))))
         return resume_button, resume_img_scaled
 
     def get_escape_button(self, active_colour):
@@ -99,8 +99,8 @@ class PlotPhotos(Plot):
                                            escape_button_highlight_colour)
         escape_img = pygame.image.load('resources/quit_return.png')
         escape_img_scaled = pygame.transform.scale(escape_img,
-                                                      (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[
-                                                                                      0] * escape_img.get_height() // escape_img.get_width()))))
+                                                   (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[
+                                                                                                 0] * escape_img.get_height() // escape_img.get_width()))))
         return escape_button, escape_img_scaled
 
     def update(self, plot_img, canvas):
@@ -122,12 +122,12 @@ class PlotPhotos(Plot):
         escape_button, escape_img_scaled = self.get_escape_button(olive)
 
         surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
-        surface.set_alpha(200)
+        surface.set_alpha(150)
 
         for i in range(0, self.tiles):
             for j in range(0, self.tiles):
                 # Display background
-                pygame.draw.rect(surface, blue_2, surface.get_rect())
+                pygame.draw.rect(surface, olive, surface.get_rect())
                 self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
                 # Display rabbits
@@ -157,6 +157,9 @@ class PlotPhotos(Plot):
 
         escape_button.render(self.window)
         self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.0125))
+
+        pygame.draw.line(self.window, (0, 0, 0), (300, 100), (300 + self.width_scale, 100), 4)
+        pygame.draw.rect(self.window, (0, 0, 0), pygame.Rect(400, 400, self.width_scale, self.height_scale))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -294,6 +297,18 @@ class SettingsMenu(Plot):
         self.wolf_male = pygame.transform.scale(wolf_male_img, (int(self.width_scale), int(self.height_scale)))
         self.wolf_female = pygame.transform.scale(wolf_female_img, (int(self.width_scale), int(self.height_scale)))
 
+    def get_map_button(self, active_colour, start_x, start_y):
+        map_button_dims = (200, 70)
+        map_button_active_colour = active_colour
+        map_button_highlight_colour = (255, 255, 255)
+        map_button = GUIElements.Button((start_x, start_y), map_button_dims, map_button_active_colour,
+                                        map_button_highlight_colour)
+        map_img = pygame.image.load('resources/map_settings.png')
+        map_img_scaled = pygame.transform.scale(map_img,
+                                                (int(map_button_dims[0] * 0.985), (int(map_button_dims[
+                                                                                           0] * map_img.get_height() // map_img.get_width()))))
+        return map_button, map_img_scaled
+
     def update(self):
         slider_width, slider_height = 300, 6
         slider_colour = "#3e4444"
@@ -320,9 +335,15 @@ class SettingsMenu(Plot):
 
         slider_N.set_default_range(default_N, default_N * 10)
 
-        start_button_dims = (200, 70)
-        start_button_pos = (self.window.get_width() // 2 + start_button_dims[0] // 4,
-                            (wolf_reproduction_rate_slider_y + start_button_dims[1]))
+        button_dims = (200, 70)
+
+        map_button, map_img_scaled = self.get_map_button((100, 100, 0),
+                                                         self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
+                                                         wolf_reproduction_rate_slider_y + button_dims[1] // 4 * 3)
+
+        start_button_dims = button_dims
+        start_button_pos = (self.window.get_width() // 2 + button_dims[0] // 4,
+                            (map_button.start_y + 1.5 * start_button_dims[1]))
         start_button_active_colour = (100, 100, 0)
         start_button_highlight_colour = (255, 255, 255)
         start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
@@ -332,9 +353,9 @@ class SettingsMenu(Plot):
                                                       (start_button_dims[0], (int(start_button_dims[
                                                                                       0] * start_sim_img.get_height() // start_sim_img.get_width()))))
 
-        start_menu_button_dims = (200, 70)
+        start_menu_button_dims = button_dims
         start_menu_button_pos = (self.window.get_width() // 4 - start_button_dims[0] // 2,
-                                 (wolf_reproduction_rate_slider_y + start_button_dims[1]))
+                                 (map_button.start_y + 1.5 * start_button_dims[1]))
         start_menu_button_active_colour = (100, 100, 0)
         start_menu_button_highlight_colour = (255, 255, 255)
         start_menu_button = GUIElements.Button(start_menu_button_pos, start_menu_button_dims,
@@ -423,6 +444,9 @@ class SettingsMenu(Plot):
             start_menu_button.render(self.window)
             self.window.blit(back_to_start_menu_img_scaled, (start_menu_button_pos[0], start_menu_button_pos[1] * 0.99))
 
+            map_button.render(self.window)
+            self.window.blit(map_img_scaled, (map_button.start_x, map_button.start_y * 1.035))
+
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     self.quit_plot()
@@ -444,8 +468,72 @@ class SettingsMenu(Plot):
                     cfg.set_default_parameters()
                     self.start_menu.update()
 
+                elif map_button.collidepoint(mouse_x, mouse_y):
+                    print("[SETTINGS MENU] entering map menu...")
+                    map_menu = MapMenu(self.window, self)
+                    map_menu.update()
+
             if self.quit or self.settings_ready:
                 break
+
+            pygame.display.update()
+
+
+class MapMenu(Plot):
+    def __init__(self, window, settings_menu):
+        super().__init__(window, window.get_width(), window.get_height())
+        self.map_ready = False
+        self.settings_menu = settings_menu
+
+        pygame.display.set_caption("Map Settings")
+
+        bg_img = pygame.image.load('resources/grass_2.jpg')
+
+        self.bg = pygame.transform.scale(bg_img, (self.width, self.height))
+
+    #def get_save_button(self, active_colour):
+    #    save_button_dims = (105, 70)
+    #    save_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815)
+    #    save_button_active_colour = active_colour
+    #    save_button_highlight_colour = (255, 255, 255)
+    #    save_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
+    #                                       escape_button_highlight_colour)
+    #    save_img = pygame.image.load('resources/quit_return.png')
+    #    save_img_scaled = pygame.transform.scale(escape_img,
+    #                                               (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[
+    #                                                                                             0] * escape_img.get_height() // escape_img.get_width()))))
+    #    return save_button, savee_img_scaled
+
+    def update(self):
+        while not self.map_ready:
+            pygame.time.delay(1)
+
+            self.window.blit(self.bg, (0, 0))
+
+            # Colour Settings
+            blue_1 = "#587e76"
+            blue_2 = "#588c7e"
+            dark_raspberry = "#c94c4c"
+            olive = (100, 100, 0)
+
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            click = False
+
+            surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
+            surface.set_alpha(150)
+
+            for i in range(0, self.tiles):
+                for j in range(0, self.tiles):
+                    # Display background
+                    pygame.draw.rect(surface, olive, surface.get_rect())
+                    self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
+
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    pygame.quit()
+                if e.type == pygame.MOUSEBUTTONDOWN:
+                    if e.button == 1:
+                        click = True
 
             pygame.display.update()
 
