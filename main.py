@@ -67,11 +67,26 @@ def start_simulation():
         return Rabbit(random.randint(0, N - 1), random.randint(0, N - 1)) if animal == Animals.Rabbit \
             else Wolf(random.randint(0, N - 1), random.randint(0, N - 1))
 
+    def create_sample_fence():
+        print(config.N)
+        # config.fence = [_ for _ in range((N + 1) ** 2)]
+        config.fence[16] = 21
+        config.fence[17] = 22
+
+        for p in range((config.N + 1) ** 2 // 2):
+            row, column = [random.randint(0, config.N) for _ in range(2)]
+            if row % 2 == 0:
+                config.fence[row * (config.N + 1) + column] = row * (config.N + 1) + column + (config.N + 1)
+            else:
+                config.fence[row * (config.N + 1) + column] = row * (config.N + 1) + column + 1
+
     plt.xlim(0, 1)
     plt.ylim(0, 20)
 
     common.can_run.set()
     common.terminate_threads.clear()
+
+    create_sample_fence()
 
     once = False
     while plot.running or not plot.pause:
@@ -146,3 +161,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

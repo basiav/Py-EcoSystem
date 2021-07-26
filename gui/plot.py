@@ -141,6 +141,18 @@ class PlotPhotos(Plot):
                 if cfg.terrain[i][j] == Animals.Wolf_Female:
                     self.window.blit(self.wolf_female, (i * self.width_scale, j * self.height_scale))
 
+                # Vertical fence elements (from upper node to lower node)
+                if cfg.fence[i * (cfg.N + 1) + (j + 1)] == i * (cfg.N + 1) + (j + 1) + cfg.N + 1:
+                    start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
+                    end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
+                    colour = [random.randint(0, 255) for _ in range(3)]
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), 5)
+                elif cfg.fence[i * (cfg.N + 1) + (j + 1)] == i * (cfg.N + 1) + (j + 1) + 1:
+                    start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
+                    end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
+                    colour = [random.randint(0, 255) for _ in range(3)]
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), 5)
+
         self.render_plot(plot_img, canvas, self)
 
         self.render_legend(self)
@@ -158,8 +170,8 @@ class PlotPhotos(Plot):
         escape_button.render(self.window)
         self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.0125))
 
-        pygame.draw.line(self.window, (0, 0, 0), (300, 100), (300 + self.width_scale, 100), 4)
-        pygame.draw.rect(self.window, (0, 0, 0), pygame.Rect(400, 400, self.width_scale, self.height_scale))
+        # pygame.draw.line(self.window, (0, 0, 0), (300, 100), (300 + self.width_scale, 100), 4)
+        # pygame.draw.rect(self.window, (0, 0, 0), pygame.Rect(400, 400, self.width_scale, self.height_scale))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -437,6 +449,7 @@ class SettingsMenu(Plot):
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \
                 = modified_N, modified_rabbits_no, modified_wolves_no, rabbit_modified_reproduction_chances, wolf_modified_reproduction_chances
             cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
+            cfg.fence = [_ for _ in range((cfg.N + 1) ** 2)]
 
             start_button.render(self.window)
             self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 0.99))
