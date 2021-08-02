@@ -124,6 +124,15 @@ class PlotPhotos(Plot):
         surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
         surface.set_alpha(150)
 
+        if cfg.N <= 20:
+            lwd = 5
+        elif cfg.N <= 30:
+            lwd = 3
+        elif cfg.N <= 50:
+            lwd = 2
+        else:
+            lwd = 1
+
         for i in range(0, self.tiles):
             for j in range(0, self.tiles):
                 # Display background
@@ -146,12 +155,12 @@ class PlotPhotos(Plot):
                     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
                     end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
                     colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), 5)
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
                 elif cfg.fence[i * (cfg.N + 1) + (j + 1)] == i * (cfg.N + 1) + (j + 1) + 1:
                     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
                     end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
                     colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), 5)
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
 
         self.render_plot(plot_img, canvas, self)
 
@@ -335,6 +344,12 @@ class SettingsMenu(Plot):
         slider_N = GUIElements.Slider(N_slider_x, N_slider_y, slider_width, slider_height, slider_colour)
         slider_rabbits = GUIElements.Slider(rabbits_no_slider_x, rabbits_no_slider_y, slider_width, slider_height,
                                             slider_colour)
+        slider_colour = "#2F4F4F"
+        slider_colour = (0, 0, 0)
+        slider_colour = "#343a40"
+        slider_colour = "#38040e"
+        slider_colour = "#85182a"
+        slider_colour = "#840032"
         slider_wolves = GUIElements.Slider(wolves_no_slider_x, wolves_no_slider_y, slider_width, slider_height,
                                            slider_colour)
         slider_rabbit_reproduction_rate = GUIElements.Slider(rabbit_reproduction_rate_slider_x,
@@ -504,18 +519,13 @@ class MapMenu(Plot):
 
         self.bg = pygame.transform.scale(bg_img, (self.width, self.height))
 
-    #def get_save_button(self, active_colour):
-    #    save_button_dims = (105, 70)
-    #    save_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815)
-    #    save_button_active_colour = active_colour
-    #    save_button_highlight_colour = (255, 255, 255)
-    #    save_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
-    #                                       escape_button_highlight_colour)
-    #    save_img = pygame.image.load('resources/quit_return.png')
-    #    save_img_scaled = pygame.transform.scale(escape_img,
-    #                                               (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[
-    #                                                                                             0] * escape_img.get_height() // escape_img.get_width()))))
-    #    return save_button, savee_img_scaled
+    # def get_save_button(self, active_colour): save_button_dims = (105, 70) save_button_pos = (self.width + abs((
+    # self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815) save_button_active_colour =
+    # active_colour save_button_highlight_colour = (255, 255, 255) save_button = GUIElements.Button(
+    # escape_button_pos, escape_button_dims, escape_button_active_colour, escape_button_highlight_colour) save_img =
+    # pygame.image.load('resources/quit_return.png') save_img_scaled = pygame.transform.scale(escape_img,
+    # (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[ 0] * escape_img.get_height() //
+    # escape_img.get_width())))) return save_button, savee_img_scaled
 
     def update(self):
         while not self.map_ready:
