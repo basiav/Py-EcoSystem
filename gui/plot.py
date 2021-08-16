@@ -151,12 +151,12 @@ class PlotPhotos(Plot):
                     self.window.blit(self.wolf_female, (i * self.width_scale, j * self.height_scale))
 
                 # Vertical fence elements (from upper node to lower node)
-                if cfg.fence[i * (cfg.N + 1) + (j + 1)] == i * (cfg.N + 1) + (j + 1) + cfg.N + 1:
+                if i * (cfg.N + 1) + (j + 1) + cfg.N + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
                     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
                     end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
                     colour = [random.randint(0, 255) for _ in range(3)]
                     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-                elif cfg.fence[i * (cfg.N + 1) + (j + 1)] == i * (cfg.N + 1) + (j + 1) + 1:
+                elif i * (cfg.N + 1) + (j + 1) + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
                     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
                     end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
                     colour = [random.randint(0, 255) for _ in range(3)]
@@ -465,7 +465,7 @@ class SettingsMenu(Plot):
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \
                 = modified_N, modified_rabbits_no, modified_wolves_no, rabbit_modified_reproduction_chances, wolf_modified_reproduction_chances
             cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
-            cfg.fence = [_ for _ in range((cfg.N + 1) ** 2)]
+            cfg.fence = [list() for _ in range((cfg.N + 1) ** 2)]
 
             start_button.render(self.window)
             self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 0.99))
