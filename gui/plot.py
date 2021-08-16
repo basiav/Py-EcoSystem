@@ -332,7 +332,8 @@ class SettingsMenu(Plot):
 
     def update(self):
         slider_width, slider_height = 300, 6
-        slider_colour = "#3e4444"
+        # slider_colour = "#3e4444"  # gray
+        slider_colour = "#840032"  # pink
         default_N = 10
 
         N_slider_x, N_slider_y = 100, self.height * 0.2
@@ -344,12 +345,12 @@ class SettingsMenu(Plot):
         slider_N = GUIElements.Slider(N_slider_x, N_slider_y, slider_width, slider_height, slider_colour)
         slider_rabbits = GUIElements.Slider(rabbits_no_slider_x, rabbits_no_slider_y, slider_width, slider_height,
                                             slider_colour)
-        slider_colour = "#2F4F4F"
-        slider_colour = (0, 0, 0)
-        slider_colour = "#343a40"
-        slider_colour = "#38040e"
-        slider_colour = "#85182a"
-        slider_colour = "#840032"
+        # slider_colour = "#2F4F4F"
+        # slider_colour = (0, 0, 0)
+        # slider_colour = "#343a40"
+        # slider_colour = "#38040e"
+        # slider_colour = "#85182a"
+
         slider_wolves = GUIElements.Slider(wolves_no_slider_x, wolves_no_slider_y, slider_width, slider_height,
                                            slider_colour)
         slider_rabbit_reproduction_rate = GUIElements.Slider(rabbit_reproduction_rate_slider_x,
