@@ -1,4 +1,4 @@
-from common import Thread, Animals, time, random, check_boundaries, set_terrain_value, set_stats
+from common import Thread, Animals, time, random, check_terrain_boundaries, set_terrain_value, set_stats
 import config
 import common
 
@@ -11,7 +11,7 @@ y_dirs = [1, 1, 0, -1, -1, -1, 0, 1]
 def check_overpopulation(x, y):
     for i in range(0, len(x_dirs) - 1):
         new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is None:
+        if check_terrain_boundaries(new_x, new_y) and config.terrain[new_x][new_y] is None:
             return x + x_dirs[i], y + y_dirs[i]
     return False
 
@@ -19,7 +19,7 @@ def check_overpopulation(x, y):
 def find_neighbour(x, y, animal):
     for i in range(0, len(x_dirs) - 1):
         new_x, new_y = x + x_dirs[i], y + y_dirs[i]
-        if check_boundaries(new_x, new_y) and config.terrain[new_x][new_y] == animal:
+        if check_terrain_boundaries(new_x, new_y) and config.terrain[new_x][new_y] == animal:
             return x + x_dirs[i], y + y_dirs[i]
     return False
 
@@ -67,7 +67,7 @@ class Rabbit(Animal):
             nx = self.x + random.randint(-1, 1)
             ny = self.y + random.randint(-1, 1)
 
-            if (not check_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
+            if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
                 continue
 
             if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.rabbit_reproduction_chances:
@@ -138,7 +138,7 @@ class Wolf(Animal):
                 else:
                     nx = self.x + random.randint(-1, 1)
                     ny = self.y + random.randint(-1, 1)
-                    if not check_boundaries(nx, ny):
+                    if not check_terrain_boundaries(nx, ny):
                         continue
 
                 if config.terrain[nx][ny] == self.opposite() and self.opposite() is not None:
