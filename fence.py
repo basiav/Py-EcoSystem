@@ -47,3 +47,23 @@ def get_node_neighbours(neighbour_direction, row, column):
     elif neighbour_direction == Directions.Left and Directions.Left not in fence_border(node):
         return get_fence_node_idx(row, column - 1)
 
+
+def add_vertex(node_idx_1, node_idx_2):
+    cfg.fence[node_idx_1].append(node_idx_2)
+
+
+def delete_vertex(node_idx_1, node_idx_2):
+    cfg.fence[node_idx_1].remove(node_idx_2)
+
+
+def check_if_wall_exists(node_idx_1, node_idx_2):
+    return node_idx_2 in cfg.fence[node_idx_1] or node_idx_1 in cfg.fence[node_idx_2]
+
+
+def build_vertex(start_node, end_node):
+    if end_node in cfg.fence[start_node] and start_node in cfg.fence[end_node]:
+        delete_vertex(end_node, start_node)  # Removing redundancy
+    elif not check_if_wall_exists(start_node, end_node):
+        add_vertex(start_node, end_node)
+
+# def build_wall(node_idx_1, node_idx_2,
