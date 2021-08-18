@@ -37,6 +37,10 @@ class Directions(Enum):
     Left = 4
 
 
+def check_terrain_boundaries(x, y):
+    return 0 <= x < cfg.N and 0 <= y < cfg.N
+
+
 def get_fence_node_idx(x, y):
     return x * (cfg.N + 1) + y
 
@@ -47,20 +51,18 @@ def get_fence_node_dirs(node_idx):
     return row, col
 
 
-def check_terrain_boundaries(x, y):
-    return 0 <= x < cfg.N and 0 <= y < cfg.N
-
-
 def fence_border(node_idx):
     row, col = get_fence_node_dirs(node_idx)
+    borders = []
     if row == 0:
-        return Directions.Up
-    elif row == cfg.N + 1:
-        return Directions.Down
-    elif col == 0:
-        return Directions.Left
-    elif col == cfg.N + 1:
-        return Directions.Right
+        borders.append(Directions.Up)
+    if row == cfg.N:
+        borders.append(Directions.Down)
+    if col == 0:
+        borders.append(Directions.Left)
+    if col == cfg.N:
+        borders.append(Directions.Right)
+    return borders
 
 
 def node_neighbours(neighbour_direction, row, column):
