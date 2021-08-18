@@ -66,21 +66,34 @@ def fence_border(node_idx):
 
 
 def node_neighbours(neighbour_direction, row, column):
-    upper_node = get_fence_node_idx(row - 1, column + 1)
-    if neighbour_direction == Directions.Up and fence_border(upper_node) != Directions.Up:
+    try:
+        node = get_fence_node_idx(row, column)
+        if node < 0 or node > (cfg.N + 1) ** 2:
+            raise NameError("NodeIndexValueError")
+    except NameError:
+        print("NodeIndexValue: ", node)
+        raise
+    print("Node: ", node)
+
+    if neighbour_direction == Directions.Up and Directions.Up not in fence_border(node):
+        upper_node = get_fence_node_idx(row - 1, column)
+        print("Upper node: ", upper_node)
         return upper_node
 
-    right_node = get_fence_node_idx(row, column + 1)
-    if neighbour_direction == Directions.Right and fence_border(right_node) != Directions.Right:
+    elif neighbour_direction == Directions.Right and Directions.Right not in fence_border(node):
+        right_node = get_fence_node_idx(row, column + 1)
+        print("Right node: ", right_node)
         return right_node
 
-    lower_node = get_fence_node_idx(row + 1, column)
-    if neighbour_direction == Directions.Down and fence_border(lower_node) != Directions.Down:
+    elif neighbour_direction == Directions.Down and Directions.Down not in fence_border(node):
+        lower_node = get_fence_node_idx(row + 1, column)
+        print("Lower node: ", lower_node)
         return lower_node
 
-    left_node = get_fence_node_idx(row, column - 1)
-    if neighbour_direction == Directions.Left and fence_border(left_node) != Directions.Left:
-        return lower_node
+    elif neighbour_direction == Directions.Left and Directions.Left not in fence_border(node):
+        left_node = get_fence_node_idx(row, column - 1)
+        print("Left node: ", left_node)
+        return left_node
 
 
 def set_terrain_value(x, y, value):

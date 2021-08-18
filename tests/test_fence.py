@@ -33,7 +33,13 @@ class MyTestCase(unittest.TestCase):
 
     def test_node_neighbours(self):
         self.assertIsNone(cmn.node_neighbours(cmn.Directions.Up, 0, 0))
+        self.assertIsNone(cmn.node_neighbours(cmn.Directions.Right, 0, 4))
+        self.assertIsNone(cmn.node_neighbours(cmn.Directions.Down, 4, 4))
+        self.assertIsNone(cmn.node_neighbours(cmn.Directions.Left, 4, 0))
         self.assertEqual(cmn.node_neighbours(cmn.Directions.Up, 4, 3), 18)
+        self.assertEqual(cmn.node_neighbours(cmn.Directions.Right, 1, 3), 9)
+        self.assertEqual(cmn.node_neighbours(cmn.Directions.Down, 3, 2), 22)
+        self.assertEqual(cmn.node_neighbours(cmn.Directions.Left, 3, 2), 16)
 
 
 if __name__ == '__main__':
