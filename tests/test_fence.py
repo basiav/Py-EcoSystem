@@ -1,5 +1,8 @@
 import unittest
 
+import sys
+sys.path.append('../')
+
 import config as cfg
 import common as cmn
 import fence
