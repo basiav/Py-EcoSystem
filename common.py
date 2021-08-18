@@ -73,27 +73,18 @@ def node_neighbours(neighbour_direction, row, column):
     except NameError:
         print("NodeIndexValue: ", node)
         raise
-    print("Node: ", node)
 
     if neighbour_direction == Directions.Up and Directions.Up not in fence_border(node):
-        upper_node = get_fence_node_idx(row - 1, column)
-        print("Upper node: ", upper_node)
-        return upper_node
+        return get_fence_node_idx(row - 1, column)
 
     elif neighbour_direction == Directions.Right and Directions.Right not in fence_border(node):
-        right_node = get_fence_node_idx(row, column + 1)
-        print("Right node: ", right_node)
-        return right_node
+        return get_fence_node_idx(row, column + 1)
 
     elif neighbour_direction == Directions.Down and Directions.Down not in fence_border(node):
-        lower_node = get_fence_node_idx(row + 1, column)
-        print("Lower node: ", lower_node)
-        return lower_node
+        return get_fence_node_idx(row + 1, column)
 
     elif neighbour_direction == Directions.Left and Directions.Left not in fence_border(node):
-        left_node = get_fence_node_idx(row, column - 1)
-        print("Left node: ", left_node)
-        return left_node
+        return get_fence_node_idx(row, column - 1)
 
 
 def set_terrain_value(x, y, value):
