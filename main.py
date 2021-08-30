@@ -3,6 +3,7 @@ import threading
 
 from common import plt
 from animals import *
+from fence import *
 from gui.plot import PlotPhotos, StartMenu
 import config
 
@@ -70,15 +71,22 @@ def start_simulation():
     def create_sample_fence():
         print(config.N)
 
-        config.fence[16].append(21)
-        config.fence[17].append(22)
+        # config.fence[16].append(21)
+        # config.fence[17].append(22)
+        build_vertex(16, 21)
+        build_vertex(17, 22)
 
-        for p in range((config.N + 1) ** 2 // 2):
-            row, column = [random.randint(0, config.N) for _ in range(2)]
-            if row % 2 == 0:
-                config.fence[row * (config.N + 1) + column].append(row * (config.N + 1) + column + (config.N + 1))
-            else:
-                config.fence[row * (config.N + 1) + column].append((row * (config.N + 1) + column + 1))
+        # for p in range((config.N + 1) ** 2 // 2):
+        #     row, column = [random.randint(0, config.N - 1) for _ in range(2)]
+        #     if row % 2 == 0:
+        #         start_node = row * (config.N + 1) + column
+        #         end_node = row * (config.N + 1) + column + (config.N + 1)
+        #     else:
+        #         start_node = row * (config.N + 1) + column
+        #         end_node = (row * (config.N + 1) + column + 1)
+        #     build_vertex(start_node, end_node)
+
+        dfs_build(16)
 
     plt.xlim(0, 1)
     plt.ylim(0, 20)

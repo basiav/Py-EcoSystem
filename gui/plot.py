@@ -1,6 +1,7 @@
 import config as cfg
 from common import pygame
 from animals import *
+from fence import *
 from gui.gui_elements import GUIElements, active_threads_string, total_animals_no, create_legend, print_settings
 
 
@@ -151,16 +152,28 @@ class PlotPhotos(Plot):
                     self.window.blit(self.wolf_female, (i * self.width_scale, j * self.height_scale))
 
                 # Vertical fence elements (from upper node to lower node)
-                if i * (cfg.N + 1) + (j + 1) + cfg.N + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
-                    start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
-                    end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
-                    colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-                elif i * (cfg.N + 1) + (j + 1) + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
-                    start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
-                    end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
-                    colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                # if i * (cfg.N + 1) + (j + 1) + cfg.N + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
+                #     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
+                #     end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
+                #     colour = [random.randint(0, 255) for _ in range(3)]
+                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                # elif i * (cfg.N + 1) + (j + 1) + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
+                #     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
+                #     end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
+                #     colour = [random.randint(0, 255) for _ in range(3)]
+                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+
+                # TODO
+
+                # for neighbour in cfg.fence[get_fence_node_idx(i, j)]:
+                #     # print(i, j, "Neighbour", neighbour)
+                #     start_x, start_y = i * self.width_scale, j * self.height_scale
+                #     end_x, end_y = get_fence_node_dirs(neighbour)[0] * self.width_scale, get_fence_node_dirs(neighbour)[1] * self.height_scale
+                #     print("Start", start_x, start_y, "End", end_x, end_y)
+                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                #     pygame.draw.line(self.window, (0, 100, 100), (end_x, end_y), (start_x, start_y), lwd)
+                #
+                # pygame.draw.line(self.window, (0, 0, 0), (10, 300), (0, 400), 5)
 
         self.render_plot(plot_img, canvas, self)
 

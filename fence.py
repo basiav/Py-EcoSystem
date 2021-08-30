@@ -26,7 +26,7 @@ def fence_border(node_idx):
     return borders
 
 
-def get_node_neighbours(neighbour_direction, row, column):
+def get_node_neighbour(neighbour_direction, row, column):
     try:
         node = get_fence_node_idx(row, column)
         if node < 0 or node > (cfg.N + 1) ** 2:
@@ -66,4 +66,25 @@ def build_vertex(start_node, end_node):
     elif not check_if_wall_exists(start_node, end_node):
         add_vertex(start_node, end_node)
 
-# def build_wall(node_idx_1, node_idx_2,
+
+def build_wall(from_node, to_node):
+    pass
+
+
+def dfs_build(start_node_idx):
+    for neighbour in cfg.fence[start_node_idx]:
+        print(neighbour)
+        dfs_visit(neighbour, 1, 10)
+    print("Fence", cfg.fence)
+
+
+def dfs_visit(current_node, i, max_rounds):
+    if i > max_rounds:
+        return
+
+    for dir in Directions:
+        next_row, next_col = get_fence_node_dirs(current_node)
+        next_node = get_node_neighbour(dir, next_row, next_col)
+        if next_node and bool(fence_border(next_node)):
+            build_vertex(current_node, next_node)
+            dfs_visit(next_node, i + 1, max_rounds)
