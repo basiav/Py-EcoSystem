@@ -83,30 +83,25 @@ def build_wall(from_node, to_node):
 
 
 def dfs_build(start_node_idx):
-    for neighbour in cfg.fence[start_node_idx]:
-        print(neighbour)
-        dfs_visit(neighbour, 1, 17)
+    print(bool(fence_border(start_node_idx)))
+    dfs_visit(start_node_idx, 20, 0)
     print("Fence", cfg.fence)
 
 
-def dfs_visit(current_node, i, max_rounds):
-    if i > max_rounds:
+def dfs_visit(current_node, wall_no, walls_already_built):
+    if walls_already_built >= wall_no:
         return
 
-    # for dir in Directions:
-    #     next_row, next_col = get_fence_node_dirs(current_node)
-    #     next_node = get_node_neighbour(dir, next_row, next_col)
-    #     if next_node and bool(fence_border(next_node)):
-    #         build_vertex(current_node, next_node)
-    #         dfs_visit(next_node, i + 1, max_rounds)
-    repeat = True
-    while repeat:
-        dir_no = random.randint(1, 4)
-        dir = Directions(dir_no)
-        print(dir)
-        next_row, next_col = get_fence_node_dirs(current_node)
-        next_node = get_node_neighbour(dir, next_row, next_col)
-        if next_node and bool(fence_border(next_node)):
-            repeat = False
-            build_vertex(current_node, next_node)
-            dfs_visit(next_node, i + 1, max_rounds)
+    possible_dirs_set = {1, 2, 3, 4}
+    while possible_dirs_set:
+        dir_no = random.sample(possible_dirs_set, 1)  # returned in a form a list
+        possible_dirs_set.remove(dir_no[0])
+        direction = Directions(dir_no[0])
+
+        # Checking whether we can follow that direction: whether a wall exists - and more??? for the future
+        current_row, current_col = get_fence_node_dirs(current_node)
+        chosen_neighbour = get_node_neighbour(direction, current_row, current_col)
+
+        if chosen_neighbour and not check_if_wall_exists(current_node, chosen_neighbour):
+            build_vertex(current_node, chosen_neighbour)
+            dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1)

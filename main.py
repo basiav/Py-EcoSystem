@@ -71,24 +71,10 @@ def start_simulation():
     def create_sample_fence():
         print(config.N)
 
-        # config.fence[16].append(21)
-        # config.fence[17].append(22)
-        build_vertex(16, 17)
+        # build_vertex(16, 17)
         build_vertex(17, 48)
-
-        # for p in range((config.N + 1) ** 2 // 2):
-        #     row, column = [random.randint(0, config.N - 1) for _ in range(2)]
-        #     if row % 2 == 0:
-        #         start_node = row * (config.N + 1) + column
-        #         end_node = row * (config.N + 1) + column + (config.N + 1)
-        #     else:
-        #         start_node = row * (config.N + 1) + column
-        #         end_node = (row * (config.N + 1) + column + 1)
-        #     build_vertex(start_node, end_node)
-
-        dfs_build(16)
         dfs_build(17)
-        #dfs_build(48)
+        # dfs_build(48)
 
     plt.xlim(0, 1)
     plt.ylim(0, 20)

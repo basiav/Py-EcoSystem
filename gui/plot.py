@@ -195,7 +195,7 @@ class PlotPhotos(Plot):
                                        get_fence_node_dirs(current_fence_node)[1] * self.height_scale
                         print("Left")
                     colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (colour), (start_x, start_y), (end_x, end_y), 5)
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
 
 
         self.render_plot(plot_img, canvas, self)
