@@ -1,5 +1,5 @@
 import config as cfg
-from common import Directions
+from common import Directions, random
 
 
 def get_fence_node_idx(x, y):
@@ -48,6 +48,17 @@ def get_node_neighbour(neighbour_direction, row, column):
         return get_fence_node_idx(row, column - 1)
 
 
+def neighbours_relations(node, neighbour):
+    if get_node_neighbour(Directions.Up, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
+        return Directions.Up
+    elif get_node_neighbour(Directions.Right, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
+        return Directions.Right
+    elif get_node_neighbour(Directions.Down, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
+        return Directions.Down
+    elif get_node_neighbour(Directions.Left, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
+        return Directions.Left
+
+
 def add_vertex(node_idx_1, node_idx_2):
     cfg.fence[node_idx_1].append(node_idx_2)
 
@@ -74,7 +85,7 @@ def build_wall(from_node, to_node):
 def dfs_build(start_node_idx):
     for neighbour in cfg.fence[start_node_idx]:
         print(neighbour)
-        dfs_visit(neighbour, 1, 10)
+        dfs_visit(neighbour, 1, 17)
     print("Fence", cfg.fence)
 
 
@@ -82,9 +93,20 @@ def dfs_visit(current_node, i, max_rounds):
     if i > max_rounds:
         return
 
-    for dir in Directions:
+    # for dir in Directions:
+    #     next_row, next_col = get_fence_node_dirs(current_node)
+    #     next_node = get_node_neighbour(dir, next_row, next_col)
+    #     if next_node and bool(fence_border(next_node)):
+    #         build_vertex(current_node, next_node)
+    #         dfs_visit(next_node, i + 1, max_rounds)
+    repeat = True
+    while repeat:
+        dir_no = random.randint(1, 4)
+        dir = Directions(dir_no)
+        print(dir)
         next_row, next_col = get_fence_node_dirs(current_node)
         next_node = get_node_neighbour(dir, next_row, next_col)
         if next_node and bool(fence_border(next_node)):
+            repeat = False
             build_vertex(current_node, next_node)
             dfs_visit(next_node, i + 1, max_rounds)

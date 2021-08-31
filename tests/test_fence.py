@@ -13,7 +13,7 @@ class MyTestCase(unittest.TestCase):
         cfg.N = 4  # All the tests below performed with N = 4
 
     def tearDown(self):
-        cfg.N = 30
+        cfg.N = 30  # Clean-Up
 
     def test_get_fence_node_idx_(self):
         self.assertEqual(fence.get_fence_node_idx(2, 3), 13)
@@ -24,6 +24,9 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(fence.get_fence_node_dirs(13), (2, 3))
         self.assertEqual(fence.get_fence_node_dirs(18), (3, 3))
         self.assertEqual(fence.get_fence_node_dirs(24), (4, 4))
+
+        self.assertEqual(fence.get_fence_node_dirs(13)[0], 2)
+        self.assertEqual(fence.get_fence_node_dirs(13)[1], 3)
 
     def test_fence_border(self):
         self.assertCountEqual(fence.fence_border(0), [cmn.Directions.Up, cmn.Directions.Left])
@@ -36,18 +39,25 @@ class MyTestCase(unittest.TestCase):
         self.assertCountEqual(fence.fence_border(5), [cmn.Directions.Left])
 
     def test_node_neighbours(self):
-        self.assertIsNone(fence.get_node_neighbours(cmn.Directions.Up, 0, 0))
-        self.assertIsNone(fence.get_node_neighbours(cmn.Directions.Right, 0, 4))
-        self.assertIsNone(fence.get_node_neighbours(cmn.Directions.Down, 4, 4))
-        self.assertIsNone(fence.get_node_neighbours(cmn.Directions.Left, 4, 0))
+        self.assertIsNone(fence.get_node_neighbour(cmn.Directions.Up, 0, 0))
+        self.assertIsNone(fence.get_node_neighbour(cmn.Directions.Right, 0, 4))
+        self.assertIsNone(fence.get_node_neighbour(cmn.Directions.Down, 4, 4))
+        self.assertIsNone(fence.get_node_neighbour(cmn.Directions.Left, 4, 0))
 
-        self.assertEqual(fence.get_node_neighbours(cmn.Directions.Up, 4, 3), 18)
-        self.assertEqual(fence.get_node_neighbours(cmn.Directions.Right, 1, 3), 9)
-        self.assertEqual(fence.get_node_neighbours(cmn.Directions.Down, 3, 2), 22)
-        self.assertEqual(fence.get_node_neighbours(cmn.Directions.Left, 3, 2), 16)
+        self.assertEqual(fence.get_node_neighbour(cmn.Directions.Up, 4, 3), 18)
+        self.assertEqual(fence.get_node_neighbour(cmn.Directions.Right, 1, 3), 9)
+        self.assertEqual(fence.get_node_neighbour(cmn.Directions.Down, 3, 2), 22)
+        self.assertEqual(fence.get_node_neighbour(cmn.Directions.Left, 3, 2), 16)
 
         with self.assertRaises(NameError):
-            fence.get_node_neighbours(cmn.Directions.Left, -1, -1)
+            fence.get_node_neighbour(cmn.Directions.Left, -1, -1)
+
+    def test_neighbour_relationships(self):
+        self.assertEqual(fence.neighbours_relations(13, 8), cmn.Directions.Up)
+        self.assertEqual(fence.neighbours_relations(13, 14), cmn.Directions.Right)
+        self.assertEqual(fence.neighbours_relations(13, 18), cmn.Directions.Down)
+        self.assertEqual(fence.neighbours_relations(13, 12), cmn.Directions.Left)
+        self.assertIsNone(fence.neighbours_relations(13, 20), None)
 
 
 if __name__ == '__main__':

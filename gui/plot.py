@@ -1,5 +1,5 @@
 import config as cfg
-from common import pygame
+from common import pygame, Directions, time
 from animals import *
 from fence import *
 from gui.gui_elements import GUIElements, active_threads_string, total_animals_no, create_legend, print_settings
@@ -135,6 +135,7 @@ class PlotPhotos(Plot):
             lwd = 1
 
         for i in range(0, self.tiles):
+        # for i in reversed(range(0, self.tiles)):
             for j in range(0, self.tiles):
                 # Display background
                 pygame.draw.rect(surface, olive, surface.get_rect())
@@ -163,17 +164,39 @@ class PlotPhotos(Plot):
                 #     colour = [random.randint(0, 255) for _ in range(3)]
                 #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
 
-                # TODO
+                current_fence_node = get_fence_node_idx(i, j)
+                neighbours_list = cfg.fence[current_fence_node]
+                if len(neighbours_list) > 1:
+                    print("More than 1 neighbour")
+                    print("Neighbour: ", current_fence_node, " Neighbours list", neighbours_list)
+                for neighbour_node in neighbours_list:
+                    if neighbours_relations(current_fence_node, neighbour_node) == Directions.Up:
+                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                        print("Up")
+                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Right:
+                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                        print("Right")
+                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Down:
+                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                        print("Down")
+                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Left:
+                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                        print("Left")
+                    colour = [random.randint(0, 255) for _ in range(3)]
+                    pygame.draw.line(self.window, (colour), (start_x, start_y), (end_x, end_y), 5)
 
-                # for neighbour in cfg.fence[get_fence_node_idx(i, j)]:
-                #     # print(i, j, "Neighbour", neighbour)
-                #     start_x, start_y = i * self.width_scale, j * self.height_scale
-                #     end_x, end_y = get_fence_node_dirs(neighbour)[0] * self.width_scale, get_fence_node_dirs(neighbour)[1] * self.height_scale
-                #     print("Start", start_x, start_y, "End", end_x, end_y)
-                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-                #     pygame.draw.line(self.window, (0, 100, 100), (end_x, end_y), (start_x, start_y), lwd)
-                #
-                # pygame.draw.line(self.window, (0, 0, 0), (10, 300), (0, 400), 5)
 
         self.render_plot(plot_img, canvas, self)
 

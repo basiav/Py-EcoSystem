@@ -73,8 +73,8 @@ def start_simulation():
 
         # config.fence[16].append(21)
         # config.fence[17].append(22)
-        build_vertex(16, 21)
-        build_vertex(17, 22)
+        build_vertex(16, 17)
+        build_vertex(17, 48)
 
         # for p in range((config.N + 1) ** 2 // 2):
         #     row, column = [random.randint(0, config.N - 1) for _ in range(2)]
@@ -87,6 +87,8 @@ def start_simulation():
         #     build_vertex(start_node, end_node)
 
         dfs_build(16)
+        dfs_build(17)
+        #dfs_build(48)
 
     plt.xlim(0, 1)
     plt.ylim(0, 20)
