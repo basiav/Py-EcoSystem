@@ -152,18 +152,6 @@ class PlotPhotos(Plot):
                 if cfg.terrain[i][j] == Animals.Wolf_Female:
                     self.window.blit(self.wolf_female, (i * self.width_scale, j * self.height_scale))
 
-                # Vertical fence elements (from upper node to lower node)
-                # if i * (cfg.N + 1) + (j + 1) + cfg.N + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
-                #     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
-                #     end_x, end_y = (i + 1) * self.width_scale, (j + 1) * self.height_scale
-                #     colour = [random.randint(0, 255) for _ in range(3)]
-                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-                # elif i * (cfg.N + 1) + (j + 1) + 1 in cfg.fence[i * (cfg.N + 1) + (j + 1)]:
-                #     start_x, start_y = i * self.width_scale, (j + 1) * self.height_scale
-                #     end_x, end_y = (i) * self.width_scale, (j) * self.height_scale
-                #     colour = [random.randint(0, 255) for _ in range(3)]
-                #     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-
                 current_fence_node = get_fence_node_idx(i, j)
                 neighbours_list = cfg.fence[current_fence_node]
                 if len(neighbours_list) > 1:

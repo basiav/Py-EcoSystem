@@ -1,5 +1,5 @@
 import config as cfg
-from common import Directions, random
+from common import Directions, random, check_terrain_boundaries
 
 
 def get_fence_node_idx(x, y):
@@ -63,47 +63,126 @@ def get_surrounding_nodes(direction, x_coord, y_coord):
     if direction == Directions.Up:
         upper_left_node_idx = get_fence_node_idx(x_coord, y_coord)
         upper_right_node_idx = get_fence_node_idx(x_coord, y_coord + 1)
-        if not (Directions.Up in fence_border(upper_left_node_idx)) and not (Directions.Up in fence_border(
-                upper_right_node_idx)):
-            return upper_left_node_idx, upper_right_node_idx
+        # if not (Directions.Up in fence_border(upper_left_node_idx)) and not (Directions.Up in fence_border(
+        #         upper_right_node_idx)):
+        return upper_left_node_idx, upper_right_node_idx
 
     elif direction == Directions.Right:
         upper_right_node_idx = get_fence_node_idx(x_coord, y_coord + 1)
         lower_right_node_idx = get_fence_node_idx(x_coord + 1, y_coord + 1)
-        if not (Directions.Right in fence_border(upper_right_node_idx)) and not (Directions.Right in fence_border(
-                lower_right_node_idx)):
-            return upper_right_node_idx, lower_right_node_idx
+        # if not (Directions.Right in fence_border(upper_right_node_idx)) and not (Directions.Right in fence_border(
+        #         lower_right_node_idx)):
+        return upper_right_node_idx, lower_right_node_idx
 
     elif direction == Directions.Down:
         lower_left_node_idx = get_fence_node_idx(x_coord + 1, y_coord)
         lower_right_node_idx = get_fence_node_idx(x_coord + 1, y_coord + 1)
-        if not (Directions.Down in fence_border(lower_right_node_idx)) and not (Directions.Down in fence_border(
-                lower_right_node_idx)):
-            return lower_left_node_idx, lower_right_node_idx
+        # if not (Directions.Down in fence_border(lower_right_node_idx)) and not (Directions.Down in fence_border(
+        #         lower_right_node_idx)):
+        return lower_left_node_idx, lower_right_node_idx
 
     elif direction == Directions.Left:
         upper_left_node_idx = get_fence_node_idx(x_coord, y_coord)
         lower_left_node_idx = get_fence_node_idx(x_coord + 1, y_coord)
-        if not (Directions.Left in fence_border(upper_left_node_idx)) and not (Directions.Left in fence_border(
-                lower_left_node_idx)):
-            return upper_left_node_idx, lower_left_node_idx
+        # if not (Directions.Left in fence_border(upper_left_node_idx)) and not (Directions.Left in fence_border(
+        #         lower_left_node_idx)):
+        return upper_left_node_idx, lower_left_node_idx
 
 
 def get_move_direction(delta_x, delta_y):
     if delta_x == 0 and delta_y == 1:
         return Directions.Up
+    elif delta_x == 1 and delta_y == 1:
+        return Directions.Up_Right
     elif delta_x == 1 and delta_y == 0:
         return Directions.Right
+    elif delta_x == 1 and delta_y == -1:
+        return Directions.Down_Right
     elif delta_x == 0 and delta_y == -1:
         return Directions.Down
+    elif delta_x == -1 and delta_y == -1:
+        return Directions.Down_Left
     elif delta_x == -1 and delta_y == 0:
         return Directions.Left
+    elif delta_x == -1 and delta_y == 1:
+        return Directions.Up_Left
 
 
 def can_make_move(current_x, current_y, delta_x, delta_y):
+    if not check_terrain_boundaries(current_x + delta_x, current_y + delta_y):
+        return False
+
     move_direction = get_move_direction(delta_x, delta_y)
-    surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_x, current_y)
-    return not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+    if move_direction in [Directions.Up, Directions.Right, Directions.Down, Directions.Left]:
+        surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_x, current_y)
+        if surrounding_node_idx_1 and surrounding_node_idx_2:
+            return not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+
+    elif move_direction in [Directions.Up_Right, Directions.Down_Right, Directions.Down_Left, Directions.Up_Left]:
+        if move_direction == Directions.Up_Right:
+            can_move_right_up, can_move_up_right = False, False
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_up = can_make_move(current_x + 1, current_y, 0, 1)
+                can_move_right_up = can_move_right and can_move_up
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_x, current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_right = can_make_move(current_x, current_y + 1, 1, 0)
+                can_move_up_right = can_move_up and can_move_right
+            return can_move_right_up or can_move_up_right
+
+        elif move_direction == Directions.Down_Right:
+            can_move_right_down, can_move_down_right = False, False
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_down = can_make_move(current_x + 1, current_y, 0, -1)
+                can_move_right_down = can_move_right and can_move_down
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_right = can_make_move(current_x, current_y - 1, 1, 0)
+                can_move_down_right = can_move_down and can_move_right
+            return can_move_right_down and can_move_down_right
+
+        elif move_direction == Directions.Down_Left:
+            can_move_left_down, can_move_down_left = False, False
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_down = can_make_move(current_x - 1, current_y, 0, -1)
+                can_move_left_down = can_move_left and can_move_down
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_left = can_make_move(current_x, current_y - 1, -1, 0)
+                can_move_down_left = can_move_down and can_move_left
+            return can_move_left_down and can_move_down_left
+
+        elif move_direction == Directions.Up_Left:
+            can_move_left_up, can_move_up_left = False, False
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_x,
+                                                                                   current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_up = can_make_move(current_x - 1, current_y, 0, 1)
+                can_move_left_up = can_move_left and can_move_up
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_x, current_y)
+            if surrounding_node_idx_1 and surrounding_node_idx_2:
+                can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+                can_move_left = can_make_move(current_x, current_y + 1, -1, 0)
+                can_move_up_left = can_move_up and can_move_left
+            return can_move_left_up and can_move_up_left
+
+    else:
+        return False
 
 
 def add_vertex(node_idx_1, node_idx_2):

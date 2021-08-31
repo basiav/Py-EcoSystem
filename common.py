@@ -35,6 +35,10 @@ class Directions(Enum):
     Right = 2
     Down = 3
     Left = 4
+    Up_Right = 5
+    Down_Right = 6
+    Down_Left = 7
+    Up_Left = 8
 
 
 def check_terrain_boundaries(x, y):

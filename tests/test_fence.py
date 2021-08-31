@@ -1,6 +1,7 @@
 import unittest
 
 import sys
+
 sys.path.append('../')
 
 import config as cfg
@@ -58,6 +59,23 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(fence.neighbours_relations(13, 18), cmn.Directions.Down)
         self.assertEqual(fence.neighbours_relations(13, 12), cmn.Directions.Left)
         self.assertIsNone(fence.neighbours_relations(13, 20), None)
+
+    def test_get_move_directions(self):
+        self.assertEqual(fence.get_move_direction(0, 1), cmn.Directions.Up)
+        self.assertEqual(fence.get_move_direction(1, 1), cmn.Directions.Up_Right)
+        self.assertEqual(fence.get_move_direction(1, 0), cmn.Directions.Right)
+        self.assertEqual(fence.get_move_direction(1, -1), cmn.Directions.Down_Right)
+        self.assertEqual(fence.get_move_direction(0, -1), cmn.Directions.Down)
+        self.assertEqual(fence.get_move_direction(-1, -1), cmn.Directions.Down_Left)
+        self.assertEqual(fence.get_move_direction(-1, 0), cmn.Directions.Left)
+        self.assertEqual(fence.get_move_direction(-1, 1), cmn.Directions.Up_Left)
+
+    def test_can_make_move(self):
+        left, neutral, right, up, down = -1, 0, 1, 1, -1
+        self.assertTrue(fence.can_make_move(1, 1, right, up))
+        self.assertTrue(fence.can_make_move(3, 1, neutral, up))
+        self.assertTrue(fence.can_make_move(0, 3, neutral, down))
+        self.assertFalse(fence.can_make_move(3, 0, right, neutral))
 
 
 if __name__ == '__main__':

@@ -43,7 +43,9 @@ class Animal(Thread):
     def check_if_alive(self):
         return not common.terminate_threads.is_set()
 
+    # Regarding fence presence, hence animal move limitations
     def check_if_can_move(self, delta_x, delta_y):
+        print("CAN MAKE MOVE", can_make_move(self.x, self.y, delta_x, delta_y))
         return can_make_move(self.x, self.y, delta_x, delta_y)
 
 
@@ -74,8 +76,10 @@ class Rabbit(Animal):
             ny = self.y + delta_y
 
             if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y) or \
-                    not self.check_if_can_move(delta_x, delta_y):
+                    (True and not self.check_if_can_move(delta_x, delta_y)):  # FLAG!!!!!!!!!!!!! map version or map-lacking version!!!!!
                 continue
+            # if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
+            #     continue
 
             if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.rabbit_reproduction_chances:
 
