@@ -59,6 +59,53 @@ def neighbours_relations(node, neighbour):
         return Directions.Left
 
 
+def get_surrounding_nodes(direction, x_coord, y_coord):
+    if direction == Directions.Up:
+        upper_left_node_idx = get_fence_node_idx(x_coord, y_coord)
+        upper_right_node_idx = get_fence_node_idx(x_coord, y_coord + 1)
+        if not (Directions.Up in fence_border(upper_left_node_idx)) and not (Directions.Up in fence_border(
+                upper_right_node_idx)):
+            return upper_left_node_idx, upper_right_node_idx
+
+    elif direction == Directions.Right:
+        upper_right_node_idx = get_fence_node_idx(x_coord, y_coord + 1)
+        lower_right_node_idx = get_fence_node_idx(x_coord + 1, y_coord + 1)
+        if not (Directions.Right in fence_border(upper_right_node_idx)) and not (Directions.Right in fence_border(
+                lower_right_node_idx)):
+            return upper_right_node_idx, lower_right_node_idx
+
+    elif direction == Directions.Down:
+        lower_left_node_idx = get_fence_node_idx(x_coord + 1, y_coord)
+        lower_right_node_idx = get_fence_node_idx(x_coord + 1, y_coord + 1)
+        if not (Directions.Down in fence_border(lower_right_node_idx)) and not (Directions.Down in fence_border(
+                lower_right_node_idx)):
+            return lower_left_node_idx, lower_right_node_idx
+
+    elif direction == Directions.Left:
+        upper_left_node_idx = get_fence_node_idx(x_coord, y_coord)
+        lower_left_node_idx = get_fence_node_idx(x_coord + 1, y_coord)
+        if not (Directions.Left in fence_border(upper_left_node_idx)) and not (Directions.Left in fence_border(
+                lower_left_node_idx)):
+            return upper_left_node_idx, lower_left_node_idx
+
+
+def get_move_direction(delta_x, delta_y):
+    if delta_x == 0 and delta_y == 1:
+        return Directions.Up
+    elif delta_x == 1 and delta_y == 0:
+        return Directions.Right
+    elif delta_x == 0 and delta_y == -1:
+        return Directions.Down
+    elif delta_x == -1 and delta_y == 0:
+        return Directions.Left
+
+
+def can_make_move(current_x, current_y, delta_x, delta_y):
+    move_direction = get_move_direction(delta_x, delta_y)
+    surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_x, current_y)
+    return not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
+
+
 def add_vertex(node_idx_1, node_idx_2):
     cfg.fence[node_idx_1].append(node_idx_2)
 

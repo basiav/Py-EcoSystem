@@ -1,6 +1,7 @@
 from common import Thread, Animals, time, random, check_terrain_boundaries, set_terrain_value, set_stats
 import config
 import common
+from fence import can_make_move
 
 sleep_time = 0.2
 
@@ -42,6 +43,9 @@ class Animal(Thread):
     def check_if_alive(self):
         return not common.terminate_threads.is_set()
 
+    def check_if_can_move(self, delta_x, delta_y):
+        return can_make_move(self.x, self.y, delta_x, delta_y)
+
 
 class Rabbit(Animal):
     def __init__(self, x, y):
@@ -64,10 +68,13 @@ class Rabbit(Animal):
 
             time.sleep(sleep_time)
 
-            nx = self.x + random.randint(-1, 1)
-            ny = self.y + random.randint(-1, 1)
+            delta_x, delta_y = random.randint(-1, 1), random.randint(-1, 1)
 
-            if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
+            nx = self.x + delta_x
+            ny = self.y + delta_y
+
+            if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y) or \
+                    not self.check_if_can_move(delta_x, delta_y):
                 continue
 
             if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.rabbit_reproduction_chances:
