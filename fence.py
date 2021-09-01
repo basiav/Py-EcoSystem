@@ -108,76 +108,78 @@ def get_move_direction(delta_x, delta_y):
         return Directions.Up_Left
 
 
-def can_make_move(current_x, current_y, delta_x, delta_y):
-    if not check_terrain_boundaries(current_x + delta_x, current_y + delta_y):
+def can_make_move(current_row, current_column, delta_x, delta_y):
+    if not check_terrain_boundaries(current_row - delta_y, current_column + delta_x):  # Column-Row/X_coord-Y_coord
+        # modification
+        print("[fence.py] [can_make_move] ERROR: Move out of the box, ", current_row - delta_y, current_column + delta_x)
         return False
 
     move_direction = get_move_direction(delta_x, delta_y)
     if move_direction in [Directions.Up, Directions.Right, Directions.Down, Directions.Left]:
-        surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_x, current_y)
+        surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_row, current_column)
         if surrounding_node_idx_1 and surrounding_node_idx_2:
             return not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
 
     elif move_direction in [Directions.Up_Right, Directions.Down_Right, Directions.Down_Left, Directions.Up_Left]:
         if move_direction == Directions.Up_Right:
             can_move_right_up, can_move_up_right = False, False
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_up = can_make_move(current_x + 1, current_y, 0, 1)
+                can_move_up = can_make_move(current_row + 1, current_column, 0, 1)
                 can_move_right_up = can_move_right and can_move_up
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_x, current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row, current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_right = can_make_move(current_x, current_y + 1, 1, 0)
+                can_move_right = can_make_move(current_row, current_column + 1, 1, 0)
                 can_move_up_right = can_move_up and can_move_right
             return can_move_right_up or can_move_up_right
 
         elif move_direction == Directions.Down_Right:
             can_move_right_down, can_move_down_right = False, False
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Right, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_down = can_make_move(current_x + 1, current_y, 0, -1)
+                can_move_down = can_make_move(current_row + 1, current_column, 0, -1)
                 can_move_right_down = can_move_right and can_move_down
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_right = can_make_move(current_x, current_y - 1, 1, 0)
+                can_move_right = can_make_move(current_row, current_column - 1, 1, 0)
                 can_move_down_right = can_move_down and can_move_right
             return can_move_right_down and can_move_down_right
 
         elif move_direction == Directions.Down_Left:
             can_move_left_down, can_move_down_left = False, False
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_down = can_make_move(current_x - 1, current_y, 0, -1)
+                can_move_down = can_make_move(current_row - 1, current_column, 0, -1)
                 can_move_left_down = can_move_left and can_move_down
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_left = can_make_move(current_x, current_y - 1, -1, 0)
+                can_move_left = can_make_move(current_row, current_column - 1, -1, 0)
                 can_move_down_left = can_move_down and can_move_left
             return can_move_left_down and can_move_down_left
 
         elif move_direction == Directions.Up_Left:
             can_move_left_up, can_move_up_left = False, False
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_x,
-                                                                                   current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Left, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_up = can_make_move(current_x - 1, current_y, 0, 1)
+                can_move_up = can_make_move(current_row - 1, current_column, 0, 1)
                 can_move_left_up = can_move_left and can_move_up
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_x, current_y)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row, current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_left = can_make_move(current_x, current_y + 1, -1, 0)
+                can_move_left = can_make_move(current_row, current_column + 1, -1, 0)
                 can_move_up_left = can_move_up and can_move_left
             return can_move_left_up and can_move_up_left
 

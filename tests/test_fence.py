@@ -86,7 +86,9 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(fence.can_make_move(1, 1, right, up))
         self.assertTrue(fence.can_make_move(3, 1, neutral, up))
         self.assertTrue(fence.can_make_move(0, 3, neutral, down))
-        self.assertFalse(fence.can_make_move(3, 0, right, neutral))
+        self.assertTrue(fence.can_make_move(3, 0, right, neutral))
+        self.assertFalse(fence.can_make_move(3, 1, neutral, down))
+        # self.assertFalse(fence.can_make_move(0, 4, neutral, neutral))
 
 
 if __name__ == '__main__':
