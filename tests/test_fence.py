@@ -83,12 +83,43 @@ class MyTestCase(unittest.TestCase):
 
     def test_can_make_move(self):
         left, neutral, right, up, down = -1, 0, 1, 1, -1
+
+        # Given, when, then
         self.assertTrue(fence.can_make_move(1, 1, right, up))
         self.assertTrue(fence.can_make_move(3, 1, neutral, up))
         self.assertTrue(fence.can_make_move(0, 3, neutral, down))
         self.assertTrue(fence.can_make_move(3, 0, right, neutral))
+        self.assertTrue(fence.can_make_move(0, 3, left, down))
         self.assertFalse(fence.can_make_move(3, 1, neutral, down))
-        # self.assertFalse(fence.can_make_move(0, 4, neutral, neutral))
+        self.assertFalse(fence.can_make_move(0, 3, right, down))
+
+        # Given, when, then
+        for row_move, col_move in zip(range(-1, 1), range(-1, 1)):
+            if row_move != 0 and col_move != 0:
+                self.assertTrue(fence.can_make_move(2, 2, col_move, row_move))
+            else:
+                self.assertFalse(fence.can_make_move(2, 2, col_move, row_move))  # Cannot stay in the same place
+
+        # Given, when
+        fence.build_vertex(11, 12)
+        fence.build_vertex(7, 12)
+        # Then
+        self.assertTrue(fence.can_make_move(2, 1, right, up))
+        # When
+        fence.build_vertex(12, 17)
+        # Then
+        self.assertFalse(fence.can_make_move(2, 1, right, up))
+        self.assertFalse(fence.can_make_move(2, 2, left, up))
+        self.assertFalse(fence.can_make_move(2, 2, left, neutral))
+        self.assertTrue(fence.can_make_move(2, 2, neutral, up))
+
+        # Given, when
+        fence.build_vertex(12, 13)
+        fence.build_vertex(17, 18)
+        fence.build_vertex(13, 18)
+        # Then
+        for row_move, col_move in zip(range(-1, 1), range(-1, 1)):
+            self.assertFalse(fence.can_make_move(2, 2, col_move, row_move))
 
 
 if __name__ == '__main__':
