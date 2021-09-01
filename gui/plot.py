@@ -135,7 +135,7 @@ class PlotPhotos(Plot):
             lwd = 1
 
         for i in range(0, self.tiles):
-        # for i in reversed(range(0, self.tiles)):
+            # for i in reversed(range(0, self.tiles)):
             for j in range(0, self.tiles):
                 # Display background
                 pygame.draw.rect(surface, olive, surface.get_rect())
@@ -156,33 +156,13 @@ class PlotPhotos(Plot):
                 neighbours_list = cfg.fence[current_fence_node]
 
                 for neighbour_node in neighbours_list:
-                    if neighbours_relations(current_fence_node, neighbour_node) == Directions.Up:
-                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
-                        # print("Up")
-                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Right:
-                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
-                        # print("Right")
-                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Down:
-                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
-                        # print("Down")
-                    elif neighbours_relations(current_fence_node, neighbour_node) == Directions.Left:
-                        start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                           get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                        end_x, end_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
-                        # print("Left")
+                    start_x, start_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                   get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                    end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                    #if (start_x, start_y) != (i, j) and (end_x, end_y) != ():
                     colour = [random.randint(0, 255) for _ in range(3)]
                     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-
 
         self.render_plot(plot_img, canvas, self)
 

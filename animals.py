@@ -44,8 +44,8 @@ class Animal(Thread):
         return not common.terminate_threads.is_set()
 
     # Regarding fence presence, hence animal move limitations
-    def check_if_can_move(self, delta_x, delta_y):
-        return can_make_move(self.x, self.y, delta_x, delta_y)
+    def check_if_can_move(self, row_delta, column_delta):
+        return can_make_move(self.x, self.y, column_delta, -1 * row_delta)
 
 
 class Rabbit(Animal):

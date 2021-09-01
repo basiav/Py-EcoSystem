@@ -12,9 +12,11 @@ import fence
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         cfg.N = 4  # All the tests below performed with N = 4
+        cfg.fence = [list() for _ in range((cfg.N + 1) ** 2)]
 
     def tearDown(self):
         cfg.N = 30  # Clean-Up
+        cfg.fence = [list() for _ in range((cfg.N + 1) ** 2)]
 
     def test_get_fence_node_idx_(self):
         self.assertEqual(fence.get_fence_node_idx(2, 3), 13)
@@ -83,14 +85,22 @@ class MyTestCase(unittest.TestCase):
 
     def test_can_make_move(self):
         left, neutral, right, up, down = -1, 0, 1, 1, -1
+        fence.delete_all_walls()
 
         # Given, when, then
+        self.assertTrue(fence.can_make_move(1, 1, left, neutral))
+        self.assertTrue(fence.can_make_move(1, 1, right, neutral))
         self.assertTrue(fence.can_make_move(1, 1, right, up))
+        self.assertTrue(fence.can_make_move(1, 1, left, up))
+        self.assertTrue(fence.can_make_move(1, 1, right, down))
+        self.assertTrue(fence.can_make_move(1, 1, left, down))
         self.assertTrue(fence.can_make_move(3, 1, neutral, up))
         self.assertTrue(fence.can_make_move(0, 3, neutral, down))
         self.assertTrue(fence.can_make_move(3, 0, right, neutral))
+        self.assertTrue(fence.can_make_move(3, 0, right, up))
         self.assertTrue(fence.can_make_move(0, 3, left, down))
         self.assertFalse(fence.can_make_move(3, 1, neutral, down))
+        self.assertFalse(fence.can_make_move(3, 1, left, down))
         self.assertFalse(fence.can_make_move(0, 3, right, down))
 
         # Given, when, then
@@ -105,6 +115,7 @@ class MyTestCase(unittest.TestCase):
         fence.build_vertex(7, 12)
         # Then
         self.assertTrue(fence.can_make_move(2, 1, right, up))
+        self.assertFalse(fence.can_make_move(1, 1, neutral, down))
         # When
         fence.build_vertex(12, 17)
         # Then
@@ -120,6 +131,20 @@ class MyTestCase(unittest.TestCase):
         # Then
         for row_move, col_move in zip(range(-1, 1), range(-1, 1)):
             self.assertFalse(fence.can_make_move(2, 2, col_move, row_move))
+
+        # Given, when
+        fence.delete_all_walls()
+        fence.build_vertex(11, 12)
+        fence.build_vertex(12, 17)
+        # Then
+        self.assertFalse(fence.can_make_move(1, 2, left, down))
+        self.assertFalse(fence.can_make_move(2, 1, right, up))
+        self.assertFalse(fence.can_make_move(2, 2, left, neutral))
+        # Given, when
+        fence.build_vertex(7, 12)
+        # Then
+        self.assertFalse(fence.can_make_move(2, 2, left, up))
+        self.assertFalse(fence.can_make_move(1, 1, right, down))
 
 
 if __name__ == '__main__':

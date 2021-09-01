@@ -111,12 +111,13 @@ def get_move_direction(delta_x, delta_y):
 def can_make_move(current_row, current_column, delta_x, delta_y):
     if not check_terrain_boundaries(current_row - delta_y, current_column + delta_x):  # Column-Row/X_coord-Y_coord
         # modification
-        print("[fence.py] [can_make_move] ERROR: Move out of the box, ", current_row - delta_y, current_column + delta_x)
+        # print("[fence.py] [can_make_move] ERROR: Move out of the box, ", current_row - delta_y, current_column + delta_x)
         return False
 
     move_direction = get_move_direction(delta_x, delta_y)
     if move_direction in [Directions.Up, Directions.Right, Directions.Down, Directions.Left]:
-        surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_row, current_column)
+        surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(move_direction, current_row,
+                                                                               current_column)
         if surrounding_node_idx_1 and surrounding_node_idx_2:
             return not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
 
@@ -127,13 +128,15 @@ def can_make_move(current_row, current_column, delta_x, delta_y):
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_up = can_make_move(current_row + 1, current_column, 0, 1)
+                can_move_up = can_make_move(current_row, current_column + 1, 0, 1)
                 can_move_right_up = can_move_right and can_move_up
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row, current_column)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_right = can_make_move(current_row, current_column + 1, 1, 0)
+                can_move_right = can_make_move(current_row - 1, current_column, 1, 0)
                 can_move_up_right = can_move_up and can_move_right
+
             return can_move_right_up or can_move_up_right
 
         elif move_direction == Directions.Down_Right:
@@ -142,15 +145,17 @@ def can_make_move(current_row, current_column, delta_x, delta_y):
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_right = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_down = can_make_move(current_row + 1, current_column, 0, -1)
+                can_move_down = can_make_move(current_row, current_column + 1, 0, -1)
                 can_move_right_down = can_move_right and can_move_down
+
             surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_row,
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_right = can_make_move(current_row, current_column - 1, 1, 0)
+                can_move_right = can_make_move(current_row + 1, current_column, 1, 0)
                 can_move_down_right = can_move_down and can_move_right
-            return can_move_right_down and can_move_down_right
+
+            return can_move_right_down or can_move_down_right
 
         elif move_direction == Directions.Down_Left:
             can_move_left_down, can_move_down_left = False, False
@@ -158,15 +163,17 @@ def can_make_move(current_row, current_column, delta_x, delta_y):
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_down = can_make_move(current_row - 1, current_column, 0, -1)
+                can_move_down = can_make_move(current_row, current_column - 1, 0, -1)
                 can_move_left_down = can_move_left and can_move_down
+
             surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Down, current_row,
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_down = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_left = can_make_move(current_row, current_column - 1, -1, 0)
+                can_move_left = can_make_move(current_row + 1, current_column, -1, 0)
                 can_move_down_left = can_move_down and can_move_left
-            return can_move_left_down and can_move_down_left
+
+            return can_move_left_down or can_move_down_left
 
         elif move_direction == Directions.Up_Left:
             can_move_left_up, can_move_up_left = False, False
@@ -174,14 +181,16 @@ def can_make_move(current_row, current_column, delta_x, delta_y):
                                                                                    current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_left = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_up = can_make_move(current_row - 1, current_column, 0, 1)
+                can_move_up = can_make_move(current_row, current_column - 1, 0, 1)
                 can_move_left_up = can_move_left and can_move_up
-            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row, current_column)
+            surrounding_node_idx_1, surrounding_node_idx_2 = get_surrounding_nodes(Directions.Up, current_row,
+                                                                                   current_column)
             if surrounding_node_idx_1 and surrounding_node_idx_2:
                 can_move_up = not check_if_wall_exists(surrounding_node_idx_1, surrounding_node_idx_2)
-                can_move_left = can_make_move(current_row, current_column + 1, -1, 0)
+                can_move_left = can_make_move(current_row - 1, current_column, -1, 0)
                 can_move_up_left = can_move_up and can_move_left
-            return can_move_left_up and can_move_up_left
+
+            return can_move_left_up or can_move_up_left
 
     else:
         return False
@@ -214,6 +223,11 @@ def build_wall(from_node, to_node):
     pass
 
 
+def delete_all_walls():
+    for i in range(0, ((cfg.N + 1) ** 2) - 1):
+        cfg.fence[i].clear()
+
+
 def get_random_factor(walls_already_built, wall_no):
     if walls_already_built < (wall_no // 2):
         random_factor = True
@@ -226,7 +240,7 @@ def get_random_factor(walls_already_built, wall_no):
 
 def dfs_build(start_node_idx):
     print(bool(fence_border(start_node_idx)))
-    dfs_visit(start_node_idx, 5, 0)
+    dfs_visit(start_node_idx, 150, 0)
     print("Fence", cfg.fence)
 
 
