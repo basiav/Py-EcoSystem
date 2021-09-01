@@ -72,8 +72,8 @@ def start_simulation():
         print(config.N)
 
         # build_vertex(16, 17)
-        build_vertex(17, 48)
-        dfs_build(17)
+        # build_vertex(17, 48)
+        dfs_build(451)
         # dfs_build(48)
 
     plt.xlim(0, 1)

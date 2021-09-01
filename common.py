@@ -55,3 +55,8 @@ def set_stats(animal_species, value):
     global stats_lock
     with stats_lock:
         cfg.stats[animal_species] += value
+
+
+def error_exit(file_name, def_name, message):
+    print("[", file_name, "] ", "[", def_name, "] ", "ERROR: ", message)
+    return

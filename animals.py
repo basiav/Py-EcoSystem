@@ -45,7 +45,6 @@ class Animal(Thread):
 
     # Regarding fence presence, hence animal move limitations
     def check_if_can_move(self, delta_x, delta_y):
-        print("CAN MAKE MOVE", can_make_move(self.x, self.y, delta_x, delta_y))
         return can_make_move(self.x, self.y, delta_x, delta_y)
 
 

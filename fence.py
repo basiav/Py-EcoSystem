@@ -1,5 +1,5 @@
 import config as cfg
-from common import Directions, random, check_terrain_boundaries
+from common import Directions, random, check_terrain_boundaries, error_exit
 
 
 def get_fence_node_idx(x, y):
@@ -198,7 +198,11 @@ def check_if_wall_exists(node_idx_1, node_idx_2):
 
 
 def build_vertex(start_node, end_node):
-    if end_node in cfg.fence[start_node] and start_node in cfg.fence[end_node]:
+    allowed_proximity_directions = [Directions.Up, Directions.Right, Directions.Down, Directions.Left]
+    if neighbours_relations(start_node, end_node) not in allowed_proximity_directions and \
+            neighbours_relations(end_node, start_node) not in allowed_proximity_directions:
+        error_exit("fence.py", "build_vertex", "Given nodes are not neighbours, thus wall cannot be built")
+    elif end_node in cfg.fence[start_node] and start_node in cfg.fence[end_node]:
         delete_vertex(end_node, start_node)  # Removing redundancy
     elif not check_if_wall_exists(start_node, end_node):
         add_vertex(start_node, end_node)
@@ -208,9 +212,19 @@ def build_wall(from_node, to_node):
     pass
 
 
+def get_random_factor(walls_already_built, wall_no):
+    if walls_already_built < (wall_no // 2):
+        random_factor = True
+    else:
+        random_factor = False
+    if random.randint(0, 1) % 2 == 0:
+        random_factor = True
+    return random_factor
+
+
 def dfs_build(start_node_idx):
     print(bool(fence_border(start_node_idx)))
-    dfs_visit(start_node_idx, 20, 0)
+    dfs_visit(start_node_idx, 5, 0)
     print("Fence", cfg.fence)
 
 

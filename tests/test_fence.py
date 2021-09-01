@@ -53,6 +53,17 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(NameError):
             fence.get_node_neighbour(cmn.Directions.Left, -1, -1)
 
+    def test_check_if_wall_exists(self):
+        self.assertFalse(fence.check_if_wall_exists(6, 11))
+        self.assertFalse(fence.check_if_wall_exists(11, 6))
+        fence.build_vertex(6, 11)
+        self.assertTrue(fence.check_if_wall_exists(6, 11))
+        self.assertTrue(fence.check_if_wall_exists(11, 6))
+        fence.build_vertex(6, 11)
+        self.assertTrue(fence.check_if_wall_exists(6, 11))
+        fence.build_vertex(16, 11)
+        self.assertTrue(fence.check_if_wall_exists(11, 16))
+
     def test_neighbour_relationships(self):
         self.assertEqual(fence.neighbours_relations(13, 8), cmn.Directions.Up)
         self.assertEqual(fence.neighbours_relations(13, 14), cmn.Directions.Right)

@@ -154,9 +154,7 @@ class PlotPhotos(Plot):
 
                 current_fence_node = get_fence_node_idx(i, j)
                 neighbours_list = cfg.fence[current_fence_node]
-                if len(neighbours_list) > 1:
-                    print("More than 1 neighbour")
-                    print("Neighbour: ", current_fence_node, " Neighbours list", neighbours_list)
+
                 for neighbour_node in neighbours_list:
                     if neighbours_relations(current_fence_node, neighbour_node) == Directions.Up:
                         start_x, start_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
