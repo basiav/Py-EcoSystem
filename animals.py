@@ -150,7 +150,7 @@ class Wolf(Animal):
                     delta_x, delta_y = random.randint(-1, 1), random.randint(-1, 1)
                     nx = self.x + delta_x
                     ny = self.y + delta_y
-                    if not check_terrain_boundaries(nx, ny) or (
+                    if not check_terrain_boundaries(nx, ny) or (nx == self.x and ny == self.y) or (
                             config.fence_flag and not self.check_if_can_move(delta_x, delta_y)):
                         continue
 
