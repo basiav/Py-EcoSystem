@@ -73,6 +73,7 @@ def start_simulation():
 
         # build_vertex(16, 17)
         # build_vertex(17, 48)
+        paint_fence_white()
         dfs_build(451)
         # dfs_build(48)
 

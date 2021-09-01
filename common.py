@@ -41,6 +41,18 @@ class Directions(Enum):
     Up_Left = 8
 
 
+class Colour(Enum):
+    White = 1
+    Grey = 2
+    Black = 3
+
+
+# class Node:
+#     def __init__(self):
+#         self.colour = Colour.White
+#         self.family = 0
+
+
 def check_terrain_boundaries(x, y):
     return 0 <= x < cfg.N and 0 <= y < cfg.N
 
