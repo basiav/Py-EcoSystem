@@ -1,5 +1,14 @@
 import config as cfg
-from common import Directions, random, check_terrain_boundaries, error_exit
+from common import Directions, random, check_terrain_boundaries, error_exit, Enum
+
+
+class Colour(Enum):
+    White = 1
+    Grey = 2
+    Black = 3
+
+
+node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
 
 def get_fence_node_idx(x, y):
@@ -240,11 +249,18 @@ def get_random_factor(walls_already_built, wall_no):
 
 def dfs_build(start_node_idx):
     print(bool(fence_border(start_node_idx)))
-    dfs_visit(start_node_idx, 150, 0)
+
+    global node_colours
+    node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
+    #wall_no =
+    dfs_visit(start_node_idx, 25, 0)
+
     print("Fence", cfg.fence)
 
 
 def dfs_visit(current_node, wall_no, walls_already_built):
+    node_colours[current_node] = Colour.Grey
+
     if walls_already_built >= wall_no:
         return
 
@@ -258,6 +274,7 @@ def dfs_visit(current_node, wall_no, walls_already_built):
         current_row, current_col = get_fence_node_dirs(current_node)
         chosen_neighbour = get_node_neighbour(direction, current_row, current_col)
 
-        if chosen_neighbour and not check_if_wall_exists(current_node, chosen_neighbour):
+        if chosen_neighbour and not check_if_wall_exists(current_node, chosen_neighbour) and \
+                node_colours[chosen_neighbour] is Colour.White:
             build_vertex(current_node, chosen_neighbour)
             dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1)
