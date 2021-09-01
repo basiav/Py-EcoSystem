@@ -118,7 +118,6 @@ def get_move_direction(delta_x, delta_y):
 def can_make_move(current_row, current_column, delta_x, delta_y):
     if not check_terrain_boundaries(current_row - delta_y, current_column + delta_x):  # Column-Row/X_coord-Y_coord
         # modification
-        # print("[fence.py] [can_make_move] ERROR: Move out of the box, ", current_row - delta_y, current_column + delta_x)
         return False
 
     move_direction = get_move_direction(delta_x, delta_y)

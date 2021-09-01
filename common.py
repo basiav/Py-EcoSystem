@@ -47,12 +47,6 @@ class Colour(Enum):
     Black = 3
 
 
-# class Node:
-#     def __init__(self):
-#         self.colour = Colour.White
-#         self.family = 0
-
-
 def check_terrain_boundaries(x, y):
     return 0 <= x < cfg.N and 0 <= y < cfg.N
 

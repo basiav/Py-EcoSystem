@@ -75,10 +75,8 @@ class Rabbit(Animal):
             ny = self.y + delta_y
 
             if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y) or \
-                    (True and not self.check_if_can_move(delta_x, delta_y)):  # FLAG!!!!!!!!!!!!! map version or map-lacking version!!!!!
+                    (config.fence_flag and not self.check_if_can_move(delta_x, delta_y)):
                 continue
-            # if (not check_terrain_boundaries(nx, ny)) or (nx == self.x and ny == self.y):
-            #     continue
 
             if config.terrain[nx][ny] == Animals.Rabbit and random.randint(1, 100) < config.rabbit_reproduction_chances:
 
@@ -144,11 +142,16 @@ class Wolf(Animal):
             if not neighbour_rabbit:
                 if self.identity == Animals.Wolf_Male and neighbour_wolf_female is not False:
                     nx, ny = neighbour_wolf_female[0], neighbour_wolf_female[1]
+                    delta_x, delta_y = self.x - nx, ny - self.y
+                    if config.fence_flag and not self.check_if_can_move(delta_x, delta_y):
+                        continue
 
                 else:
-                    nx = self.x + random.randint(-1, 1)
-                    ny = self.y + random.randint(-1, 1)
-                    if not check_terrain_boundaries(nx, ny):
+                    delta_x, delta_y = random.randint(-1, 1), random.randint(-1, 1)
+                    nx = self.x + delta_x
+                    ny = self.y + delta_y
+                    if not check_terrain_boundaries(nx, ny) or (
+                            config.fence_flag and not self.check_if_can_move(delta_x, delta_y)):
                         continue
 
                 if config.terrain[nx][ny] == self.opposite() and self.opposite() is not None:
@@ -164,5 +167,9 @@ class Wolf(Animal):
                     self.decrease_energy()
 
             else:
+                nx, ny = neighbour_rabbit[0], neighbour_rabbit[1]
+                delta_x, delta_y = self.x - nx, ny - self.y
+                if config.fence_flag and not self.check_if_can_move(delta_x, delta_y):
+                    continue
                 self.make_move(neighbour_rabbit[0], neighbour_rabbit[1])
                 self.increase_energy()
