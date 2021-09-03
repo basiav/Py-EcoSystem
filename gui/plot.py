@@ -157,10 +157,10 @@ class PlotPhotos(Plot):
 
                 for neighbour_node in neighbours_list:
                     start_x, start_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                   get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
                     end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                    #if (start_x, start_y) != (i, j) and (end_x, end_y) != ():
+                                   get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                    # if (start_x, start_y) != (i, j) and (end_x, end_y) != ():
                     colour = [random.randint(0, 255) for _ in range(3)]
                     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
 
@@ -522,25 +522,91 @@ class MapMenu(Plot):
 
         self.bg = pygame.transform.scale(bg_img, (self.width, self.height))
 
-    # def get_save_button(self, active_colour): save_button_dims = (105, 70) save_button_pos = (self.width + abs((
-    # self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815) save_button_active_colour =
-    # active_colour save_button_highlight_colour = (255, 255, 255) save_button = GUIElements.Button(
-    # escape_button_pos, escape_button_dims, escape_button_active_colour, escape_button_highlight_colour) save_img =
-    # pygame.image.load('resources/quit_return.png') save_img_scaled = pygame.transform.scale(escape_img,
-    # (int(escape_button_dims[0] * 0.985), (int(escape_button_dims[ 0] * escape_img.get_height() //
-    # escape_img.get_width())))) return save_button, savee_img_scaled
+    def get_save_button(self, active_colour, start_x, start_y):
+        save_button_dims = (200, 70)
+        save_button_active_colour = active_colour
+        save_button_highlight_colour = (255, 255, 255)
+        save_button = GUIElements.Button((start_x, start_y), save_button_dims, save_button_active_colour,
+                                         save_button_highlight_colour)
+        save_img = pygame.image.load('resources/map_settings.png')
+        save_img_scaled = pygame.transform.scale(save_img,
+                                                 (int(save_button_dims[0] * 0.985),
+                                                  (int(save_button_dims[0] * save_img.get_height() //
+                                                       save_img.get_width()))))
+        return save_button, save_img_scaled
+
+    def get_fence_slider(self):
+        # slider_colour = "#3e4444"  # gray
+        slider_colour = "#840032"  # pink
+        slider_width, slider_height = 300, 6
+        fence_slider_x, fence_slider_y = 100, self.height * 0.7
+        min_fence_elements = 0
+
+        slider_fence = GUIElements.Slider(fence_slider_x, fence_slider_y, slider_width, slider_height, slider_colour)
+        slider_fence.set_default_range(min_fence_elements,
+                                       (min_fence_elements + 1) * 3)  # FIX THIS, HOW MANY MAZE ISLANDS MAX???
+
+        return slider_fence
+
+    def get_fence_slider_text(self, slider_fence):
+        text_bg_surf = pygame.Surface((self.width_scale * 3, self.height_scale * 1.5))
+        slider_width, slider_height = 300, 6
+        fence_slider_x, fence_slider_y = 100, self.height * 0.7
+        modified_fence_elements = slider_fence.get_scaled_value()
+        text_fence = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+                                          slider_fence.start_x + slider_width * 1.1,
+                                          fence_slider_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
+                                          "Fence Islands: " + str(modified_fence_elements), bg=False)
+
+        return text_fence
+
+    def update_config_fence_settings(self, slider_fence):
+        cfg.fence_elements = slider_fence.get_scaled_value()
+
+    def generate_random_fence(self):
+        print(config.N)
+        reset_fence()
+        dfs_build(451)
+
+    def draw_current_mazes(self):
+        lwd = 3
+        surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
+        surface.set_alpha(150)
+        olive = (100, 100, 0)
+
+        for i in range(0, self.tiles):
+            for j in range(0, self.tiles):
+                current_fence_node = get_fence_node_idx(i, j)
+                neighbours_list = cfg.fence[current_fence_node]
+
+                for neighbour_node in neighbours_list:
+                    start_x, start_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
+                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
+                    end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
+                                   get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                # Display background
+                pygame.draw.rect(surface, olive, surface.get_rect())
+                self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
+                pass
 
     def update(self):
+        # Colour Settings
+        blue_1 = "#587e76"
+        blue_2 = "#588c7e"
+        dark_raspberry = "#c94c4c"
+        olive = (100, 100, 0)
+
+        button_dims = (200, 70)
+        save_button, save_img_scaled = self.get_save_button((100, 100, 0),
+                                                            self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
+                                                            self.window.get_height() * 0.7 + button_dims[1] // 4 * 3)
+        slider_fence = self.get_fence_slider()
+
         while not self.map_ready:
             pygame.time.delay(1)
 
             self.window.blit(self.bg, (0, 0))
-
-            # Colour Settings
-            blue_1 = "#587e76"
-            blue_2 = "#588c7e"
-            dark_raspberry = "#c94c4c"
-            olive = (100, 100, 0)
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
             click = False
@@ -548,17 +614,45 @@ class MapMenu(Plot):
             surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
             surface.set_alpha(150)
 
-            for i in range(0, self.tiles):
-                for j in range(0, self.tiles):
-                    # Display background
-                    pygame.draw.rect(surface, olive, surface.get_rect())
-                    self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
+            slider_fence.perform(self.window)
+            text_fence = self.get_fence_slider_text(slider_fence)
+            text_fence.render()
+            self.update_config_fence_settings(slider_fence)
+
+            save_button.render(self.window)
+            self.window.blit(save_img_scaled, (save_button.start_x, save_button.start_y * 1.035))
+
+            # for i in range(0, self.tiles):
+            #     for j in range(0, self.tiles):
+            #         # Display background
+            #         pygame.draw.rect(surface, olive, surface.get_rect())
+            #         self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    pygame.quit()
+                    self.quit_plot()
+                    self.settings_menu.quit_plot()
+                    self.settings_menu.start_menu.quit_plot()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     if e.button == 1:
                         click = True
+
+            if self.quit:
+                break
+
+            self.draw_current_mazes()
+
+            if click:
+                if save_button.collidepoint(mouse_x, mouse_y):
+                    print("[MAP SETTINGS MENU] saving map settings and going back to main settings menu...")
+                    self.map_ready = True
+                    self.settings_menu.update()
+                    print("Generated Fence Settings: ", cfg.fence)
+
+                else:
+                    self.generate_random_fence()
+
+            if self.quit or self.map_ready:
+                break
 
             pygame.display.update()

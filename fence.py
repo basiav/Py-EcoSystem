@@ -234,6 +234,11 @@ def delete_all_walls():
         cfg.fence[i].clear()
 
 
+def reset_fence():
+    delete_all_walls()
+    paint_fence_white()
+
+
 def get_random_factor(walls_already_built, wall_no):
     if walls_already_built < (wall_no // 2):
         random_factor = True
