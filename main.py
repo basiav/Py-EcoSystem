@@ -36,7 +36,6 @@ def create_start_menu():
 
 
 def create_sample_fence():
-    # print(config.N)
     reset_fence()
     dfs_build(451)
 

@@ -250,11 +250,14 @@ def get_random_factor(walls_already_built, wall_no):
 
 
 def dfs_build(start_node_idx):
-    # start_row, start_col = 1 // 2 * cfg.N, 1 // 2 * cfg.N
-    # start_node_idx =
-    # for _ in range(1, cfg.fence_elements):
-    print(bool(fence_border(start_node_idx)))
-    dfs_visit(start_node_idx, cfg.N, 0)
+    start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
+    start_node_idx = get_fence_node_idx(start_row, start_col)
+    max_wall_length = int(cfg.N * 2 / 3)
+    for _ in range(0, cfg.fence_elements):
+        if bool(fence_border(start_node_idx)):
+            print("[fence.py] [dfs_build] error: start_node_idx turned out to be at map border, illegal placement. "
+                  "Please repeat the procedure.")
+        dfs_visit(start_node_idx, max_wall_length, 0)
 
     print("Fence", cfg.fence)
 
