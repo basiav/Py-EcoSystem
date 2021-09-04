@@ -233,6 +233,8 @@ class StartMenu(Plot):
         self.quit = False
 
     def update(self):
+        pygame.display.set_caption("Start Menu")
+
         settings_button_dims = (200, 200)
         settings_button_pos = (self.width // 2 - settings_button_dims[1], self.height // 4)
         settings_button_active_colour = (100, 100, 0)
@@ -334,6 +336,15 @@ class SettingsMenu(Plot):
                                                                                            0] * map_img.get_height() // map_img.get_width()))))
         return map_button, map_img_scaled
 
+    def get_title_picture(self):
+        dims = (self.window.get_width(), self.window.get_height())
+        title_img = pygame.image.load('resources/adjust_settings.png')
+        title_img_scaled = pygame.transform.scale(title_img,
+                                                  (int(int(dims[0]) * 0.5),
+                                                   (int(dims[0] * 0.5 * title_img.get_height() //
+                                                        title_img.get_width()))))
+        return title_img_scaled
+
     def update(self):
         slider_width, slider_height = 300, 6
         # slider_colour = "#3e4444"  # gray
@@ -398,15 +409,22 @@ class SettingsMenu(Plot):
                                                                (start_menu_button_dims[0], (int(start_menu_button_dims[
                                                                                                     0] * back_to_start_menu_img.get_height() // back_to_start_menu_img.get_width()))))
 
+        title_img_scaled = self.get_title_picture()
+
         memorise_fence = False
 
         while not self.settings_ready and self.do_continue:
+            pygame.display.set_caption("Settings Menu")
+
             pygame.time.delay(1)
 
-            # Settings
-            # surface = pygame.Surface((self.width_scale, self.height_scale))
-
             self.window.blit(self.bg, (0, 0))
+
+            try:
+                self.window.blit(title_img_scaled, (self.window.get_width() // 4 - 15, -40))
+            except:
+                print("[plot.py] [MapMenu] [update] error: error with displaying instruction img. "
+                      "(probably a problem with negative y value)")
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -543,12 +561,21 @@ class MapMenu(Plot):
         save_button_highlight_colour = (255, 255, 255)
         save_button = GUIElements.Button((start_x, start_y), save_button_dims, save_button_active_colour,
                                          save_button_highlight_colour)
-        save_img = pygame.image.load('resources/map_settings.png')
+        save_img = pygame.image.load('resources/save_and_back_to_settings.png')
         save_img_scaled = pygame.transform.scale(save_img,
                                                  (int(save_button_dims[0] * 0.985),
                                                   (int(save_button_dims[0] * save_img.get_height() //
                                                        save_img.get_width()))))
         return save_button, save_img_scaled
+
+    def get_title_picture(self):
+        dims = (self.window.get_width(), self.window.get_height())
+        map_img = pygame.image.load('resources/click_map.png')
+        map_img_scaled = pygame.transform.scale(map_img,
+                                                (int(dims[0]),
+                                                 (int(dims[0] * map_img.get_height() //
+                                                      map_img.get_width()))))
+        return map_img_scaled
 
     def get_fence_slider(self):
         # slider_colour = "#3e4444"  # gray
@@ -589,13 +616,13 @@ class MapMenu(Plot):
 
         maze_scale = 0.6
         width_scale, height_scale = self.width_scale * maze_scale, self.height_scale * maze_scale
-        x_translation_vector, y_translation_vector = (
-                                                                 1 - maze_scale) * self.window.get_width() / 2, 0.05 * self.window.get_height()
+        x_translation_vector, y_translation_vector = (1 - maze_scale) * self.window.get_width() / 2, \
+                                                     0.1 * self.window.get_height()
 
         map_upper_left_corner = (0 + x_translation_vector, 0 + y_translation_vector)
         map_upper_right_corner = (self.tiles * width_scale + x_translation_vector, 0 + y_translation_vector)
         map_lower_right_corner = (
-        self.tiles * width_scale + x_translation_vector, self.tiles * height_scale + y_translation_vector)
+            self.tiles * width_scale + x_translation_vector, self.tiles * height_scale + y_translation_vector)
         map_lower_left_corner = (0 + x_translation_vector, self.tiles * height_scale + y_translation_vector)
 
         rect_width = map_upper_right_corner[0] - map_upper_left_corner[0]
@@ -625,11 +652,14 @@ class MapMenu(Plot):
                     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
 
     def update(self):
+        pygame.display.set_caption("Map Settings")
         # Colour Settings
         blue_1 = "#587e76"
         blue_2 = "#588c7e"
         dark_raspberry = "#c94c4c"
         olive = (100, 100, 0)
+
+        title_img_scaled = self.get_title_picture()
 
         button_dims = (200, 70)
         save_button, save_img_scaled = self.get_save_button((100, 100, 0),
@@ -641,6 +671,12 @@ class MapMenu(Plot):
             pygame.time.delay(1)
 
             self.window.blit(self.bg, (0, 0))
+
+            try:
+                self.window.blit(title_img_scaled, (0, -140))
+            except:
+                print("[plot.py] [MapMenu] [update] error: error with displaying instruction img. "
+                      "(probably a problem with negative y value)")
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
             click = False
@@ -654,7 +690,7 @@ class MapMenu(Plot):
             self.update_config_fence_settings(slider_fence)
 
             save_button.render(self.window)
-            self.window.blit(save_img_scaled, (save_button.start_x, save_button.start_y * 1.035))
+            self.window.blit(save_img_scaled, (save_button.start_x, save_button.start_y * 0.98))
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:

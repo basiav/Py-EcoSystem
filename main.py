@@ -85,7 +85,7 @@ def start_simulation():
         image = create_bar_img()
 
         while not once:
-            for n in range(minimum):
+            for _ in range(minimum):
                 # Rabbits
                 create_animal_on_random_pos(Animals.Rabbit).start()
                 plot.update(image, canvas)
@@ -97,14 +97,14 @@ def start_simulation():
                 time.sleep(0.1)
 
             if minimum == wolf_no:
-                for i in range(abs(wolf_no - rabbit_no)):
+                for _ in range(abs(wolf_no - rabbit_no)):
                     # Rabbits
                     create_animal_on_random_pos(Animals.Rabbit).start()
                     plot.update(image, canvas)
 
             elif minimum == rabbit_no:
                 # Wolves
-                for i in range(abs(wolf_no - rabbit_no)):
+                for _ in range(abs(wolf_no - rabbit_no)):
                     create_animal_on_random_pos(Animals.Wolf_In_General).start()
                     plot.update(image, canvas)
 
