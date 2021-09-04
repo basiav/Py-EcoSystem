@@ -7,14 +7,13 @@ from gui.gui_elements import GUIElements, active_threads_string, total_animals_n
 
 def get_lwd():
     if cfg.N <= 20:
-        lwd = 5
+        return 5
     elif cfg.N <= 30:
-        lwd = 3
+        return 3
     elif cfg.N <= 50:
-        lwd = 2
+        return 2
     else:
-        lwd = 1
-    return lwd
+        return 1
 
 
 class Plot:
@@ -185,9 +184,6 @@ class PlotPhotos(Plot):
 
         escape_button.render(self.window)
         self.window.blit(escape_img_scaled, (escape_button.start_x, escape_button.start_y * 1.0125))
-
-        # pygame.draw.line(self.window, (0, 0, 0), (300, 100), (300 + self.width_scale, 100), 4)
-        # pygame.draw.rect(self.window, (0, 0, 0), pygame.Rect(400, 400, self.width_scale, self.height_scale))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -469,6 +465,7 @@ class SettingsMenu(Plot):
                                                                   bg=False)
             text_wolf_reproduction_chances.render()
 
+            # Settings established
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \
                 = modified_N, modified_rabbits_no, modified_wolves_no, rabbit_modified_reproduction_chances, wolf_modified_reproduction_chances
             cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]

@@ -250,9 +250,11 @@ def get_random_factor(walls_already_built, wall_no):
 
 
 def dfs_build(start_node_idx):
+    # start_row, start_col = 1 // 2 * cfg.N, 1 // 2 * cfg.N
+    # start_node_idx =
+    # for _ in range(1, cfg.fence_elements):
     print(bool(fence_border(start_node_idx)))
-
-    dfs_visit(start_node_idx, 30, 0)
+    dfs_visit(start_node_idx, cfg.N, 0)
 
     print("Fence", cfg.fence)
 

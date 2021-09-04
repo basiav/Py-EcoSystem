@@ -35,6 +35,12 @@ def create_start_menu():
     return StartMenu(800, 650)
 
 
+def create_sample_fence():
+    # print(config.N)
+    reset_fence()
+    dfs_build(451)
+
+
 def start_simulation():
     plot = PlotPhotos(700, 700, agg)
 
@@ -68,22 +74,11 @@ def start_simulation():
         return Rabbit(random.randint(0, N - 1), random.randint(0, N - 1)) if animal == Animals.Rabbit \
             else Wolf(random.randint(0, N - 1), random.randint(0, N - 1))
 
-    def create_sample_fence():
-        print(config.N)
-
-        # build_vertex(16, 17)
-        # build_vertex(17, 48)
-        reset_fence()
-        dfs_build(451)
-        # dfs_build(48)
-
     plt.xlim(0, 1)
     plt.ylim(0, 20)
 
     common.can_run.set()
     common.terminate_threads.clear()
-
-    create_sample_fence()
 
     once = False
     while plot.running or not plot.pause:
@@ -143,6 +138,7 @@ def main():
         start_menu.update()
         if start_menu.start_game:
             print("[MAIN] Starting simulation!")
+            create_sample_fence()
             res = start_simulation()
             print("[MAIN] Simulation over")
             res.quit_plot()
@@ -158,4 +154,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
