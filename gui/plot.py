@@ -5,6 +5,18 @@ from fence import *
 from gui.gui_elements import GUIElements, active_threads_string, total_animals_no, create_legend, print_settings
 
 
+def get_lwd():
+    if cfg.N <= 20:
+        lwd = 5
+    elif cfg.N <= 30:
+        lwd = 3
+    elif cfg.N <= 50:
+        lwd = 2
+    else:
+        lwd = 1
+    return lwd
+
+
 class Plot:
     def __init__(self, window, width, height):
         self.window = window
@@ -125,14 +137,7 @@ class PlotPhotos(Plot):
         surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
         surface.set_alpha(150)
 
-        if cfg.N <= 20:
-            lwd = 5
-        elif cfg.N <= 30:
-            lwd = 3
-        elif cfg.N <= 50:
-            lwd = 2
-        else:
-            lwd = 1
+        lwd = get_lwd()
 
         for i in range(0, self.tiles):
             # for i in reversed(range(0, self.tiles)):
@@ -539,7 +544,7 @@ class MapMenu(Plot):
         # slider_colour = "#3e4444"  # gray
         slider_colour = "#840032"  # pink
         slider_width, slider_height = 300, 6
-        fence_slider_x, fence_slider_y = 100, self.height * 0.7
+        fence_slider_x, fence_slider_y = 160, self.height * 0.75
         min_fence_elements = 0
 
         slider_fence = GUIElements.Slider(fence_slider_x, fence_slider_y, slider_width, slider_height, slider_colour)
@@ -551,7 +556,7 @@ class MapMenu(Plot):
     def get_fence_slider_text(self, slider_fence):
         text_bg_surf = pygame.Surface((self.width_scale * 3, self.height_scale * 1.5))
         slider_width, slider_height = 300, 6
-        fence_slider_x, fence_slider_y = 100, self.height * 0.7
+        fence_slider_x, fence_slider_y = 160, self.height * 0.75
         modified_fence_elements = slider_fence.get_scaled_value()
         text_fence = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
                                           slider_fence.start_x + slider_width * 1.1,
@@ -569,26 +574,43 @@ class MapMenu(Plot):
         dfs_build(451)
 
     def draw_current_mazes(self):
-        lwd = 3
-        surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
-        surface.set_alpha(150)
         olive = (100, 100, 0)
+        lwd = get_lwd()
+
+        maze_scale = 0.6
+        width_scale, height_scale = self.width_scale * maze_scale, self.height_scale * maze_scale
+        x_translation_vector, y_translation_vector = (1 - maze_scale) * self.window.get_width() / 2, 0.05 * self.window.get_height()
+
+        map_upper_left_corner = (0 + x_translation_vector, 0 + y_translation_vector)
+        map_upper_right_corner = (self.tiles * width_scale + x_translation_vector, 0 + y_translation_vector)
+        map_lower_right_corner = (self.tiles * width_scale + x_translation_vector, self.tiles * height_scale + y_translation_vector)
+        map_lower_left_corner = (0 + x_translation_vector, self.tiles * height_scale + y_translation_vector)
+
+        rect_width = map_upper_right_corner[0] - map_upper_left_corner[0]
+        rect_height = map_lower_left_corner[1] - map_upper_left_corner[1]
+
+        surface = pygame.Surface((rect_width, rect_height), pygame.SRCALPHA)
+        surface.set_alpha(150)
+
+        pygame.draw.rect(surface, olive, surface.get_rect())
+        self.window.blit(surface, map_upper_left_corner)
 
         for i in range(0, self.tiles):
+            pygame.draw.line(self.window, (0, 0, 0), map_upper_left_corner, map_upper_right_corner, lwd)
+            pygame.draw.line(self.window, (0, 0, 0), map_upper_left_corner, map_lower_left_corner, lwd)
+            pygame.draw.line(self.window, (0, 0, 0), map_lower_right_corner, map_upper_right_corner, lwd)
+            pygame.draw.line(self.window, (0, 0, 0), map_lower_left_corner, map_lower_right_corner, lwd)
+
             for j in range(0, self.tiles):
                 current_fence_node = get_fence_node_idx(i, j)
                 neighbours_list = cfg.fence[current_fence_node]
 
                 for neighbour_node in neighbours_list:
-                    start_x, start_y = get_fence_node_dirs(current_fence_node)[0] * self.width_scale, \
-                                       get_fence_node_dirs(current_fence_node)[1] * self.height_scale
-                    end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
-                                   get_fence_node_dirs(neighbour_node)[1] * self.height_scale
+                    start_x, start_y = get_fence_node_dirs(current_fence_node)[0] * width_scale + x_translation_vector, \
+                                       get_fence_node_dirs(current_fence_node)[1] * height_scale + y_translation_vector
+                    end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * width_scale + x_translation_vector, \
+                                   get_fence_node_dirs(neighbour_node)[1] * height_scale + y_translation_vector
                     pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
-                # Display background
-                pygame.draw.rect(surface, olive, surface.get_rect())
-                self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
-                pass
 
     def update(self):
         # Colour Settings
@@ -600,7 +622,7 @@ class MapMenu(Plot):
         button_dims = (200, 70)
         save_button, save_img_scaled = self.get_save_button((100, 100, 0),
                                                             self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
-                                                            self.window.get_height() * 0.7 + button_dims[1] // 4 * 3)
+                                                            self.window.get_height() * 0.755 + button_dims[1] // 4 * 3)
         slider_fence = self.get_fence_slider()
 
         while not self.map_ready:
@@ -621,12 +643,6 @@ class MapMenu(Plot):
 
             save_button.render(self.window)
             self.window.blit(save_img_scaled, (save_button.start_x, save_button.start_y * 1.035))
-
-            # for i in range(0, self.tiles):
-            #     for j in range(0, self.tiles):
-            #         # Display background
-            #         pygame.draw.rect(surface, olive, surface.get_rect())
-            #         self.window.blit(surface, (i * self.width_scale, j * self.height_scale))
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
