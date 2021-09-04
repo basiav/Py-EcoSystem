@@ -158,5 +158,6 @@ def create_legend():
 
 
 def print_settings():
-    print("Settings:", "[ N: ", cfg.N, "]", "[ Rabbits: ", cfg.rabbit_no, "]", "[ Wolves: ", cfg.wolf_no, "]",
-          "[ Reproduction chances: ", cfg.rabbit_reproduction_chances / 100, "]")
+    print("[GUI ELEMENTS - SETTINGS]", "[N:", cfg.N, "]", "[Rabbits: ", cfg.rabbit_no, "]", "[Wolves: ", cfg.wolf_no, "]",
+          "[Rabbit Reproduction Chances:", cfg.rabbit_reproduction_chances / 100, "]",
+          "[Wolf Reproduction Chances:", cfg.wolf_reproduction_chances / 100, "]")

@@ -36,7 +36,7 @@ def create_start_menu():
 
 
 def create_sample_fence():
-    reset_fence()
+    # reset_fence()
     dfs_build(451)
 
 
@@ -133,6 +133,8 @@ def main():
     start_menu = create_start_menu()
     escape = start_menu.quit
 
+    reset_fence()
+
     while not escape:
         start_menu.update()
         if start_menu.start_game:
@@ -145,6 +147,7 @@ def main():
         if not start_menu.quit:
             start_menu = create_start_menu()
             config.set_default_parameters()
+            reset_fence()
 
         escape = start_menu.quit
 

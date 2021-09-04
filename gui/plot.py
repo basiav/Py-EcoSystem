@@ -307,6 +307,7 @@ class SettingsMenu(Plot):
     def __init__(self, window, previous_start_menu):
         super().__init__(window, window.get_width(), window.get_height())
         self.settings_ready = False
+        self.do_continue = True
         self.start_menu = previous_start_menu
 
         pygame.display.set_caption("Settings Menu")
@@ -397,7 +398,9 @@ class SettingsMenu(Plot):
                                                                (start_menu_button_dims[0], (int(start_menu_button_dims[
                                                                                                     0] * back_to_start_menu_img.get_height() // back_to_start_menu_img.get_width()))))
 
-        while not self.settings_ready:
+        memorise_fence = False
+
+        while not self.settings_ready and self.do_continue:
             pygame.time.delay(1)
 
             # Settings
@@ -465,11 +468,19 @@ class SettingsMenu(Plot):
                                                                   bg=False)
             text_wolf_reproduction_chances.render()
 
+            if memorise_fence and modified_N != cfg.N:
+                reset_fence = True
+            else:
+                reset_fence = False
+
             # Settings established
             cfg.N, cfg.rabbit_no, cfg.wolf_no, cfg.rabbit_reproduction_chances, cfg.wolf_reproduction_chances \
                 = modified_N, modified_rabbits_no, modified_wolves_no, rabbit_modified_reproduction_chances, wolf_modified_reproduction_chances
             cfg.terrain = [[None for _ in range(cfg.N)] for _ in range(cfg.N)]
-            cfg.fence = [list() for _ in range((cfg.N + 1) ** 2)]
+            if reset_fence:
+                cfg.redeclare_fence()
+            if not memorise_fence:
+                cfg.fence = [list() for _ in range((cfg.N + 1) ** 2)]
 
             start_button.render(self.window)
             self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 0.99))
@@ -503,6 +514,8 @@ class SettingsMenu(Plot):
 
                 elif map_button.collidepoint(mouse_x, mouse_y):
                     print("[SETTINGS MENU] entering map menu...")
+                    self.do_continue = False
+                    memorise_fence = True
                     map_menu = MapMenu(self.window, self)
                     map_menu.update()
 
@@ -566,7 +579,7 @@ class MapMenu(Plot):
         cfg.fence_elements = slider_fence.get_scaled_value()
 
     def generate_random_fence(self):
-        print(config.N)
+        # print(config.N)
         reset_fence()
         dfs_build(451)
 
@@ -576,11 +589,13 @@ class MapMenu(Plot):
 
         maze_scale = 0.6
         width_scale, height_scale = self.width_scale * maze_scale, self.height_scale * maze_scale
-        x_translation_vector, y_translation_vector = (1 - maze_scale) * self.window.get_width() / 2, 0.05 * self.window.get_height()
+        x_translation_vector, y_translation_vector = (
+                                                                 1 - maze_scale) * self.window.get_width() / 2, 0.05 * self.window.get_height()
 
         map_upper_left_corner = (0 + x_translation_vector, 0 + y_translation_vector)
         map_upper_right_corner = (self.tiles * width_scale + x_translation_vector, 0 + y_translation_vector)
-        map_lower_right_corner = (self.tiles * width_scale + x_translation_vector, self.tiles * height_scale + y_translation_vector)
+        map_lower_right_corner = (
+        self.tiles * width_scale + x_translation_vector, self.tiles * height_scale + y_translation_vector)
         map_lower_left_corner = (0 + x_translation_vector, self.tiles * height_scale + y_translation_vector)
 
         rect_width = map_upper_right_corner[0] - map_upper_left_corner[0]
@@ -659,8 +674,8 @@ class MapMenu(Plot):
                 if save_button.collidepoint(mouse_x, mouse_y):
                     print("[MAP SETTINGS MENU] saving map settings and going back to main settings menu...")
                     self.map_ready = True
-                    self.settings_menu.update()
-                    print("Generated Fence Settings: ", cfg.fence)
+                    # self.settings_menu.update()
+                    self.settings_menu.do_continue = True
 
                 else:
                     self.generate_random_fence()

@@ -231,7 +231,8 @@ def build_wall(from_node, to_node):
 
 def delete_all_walls():
     for i in range(0, ((cfg.N + 1) ** 2) - 1):
-        cfg.fence[i].clear()
+        # cfg.fence[i].clear()
+        cfg.fence[i] = list()
 
 
 def reset_fence():
@@ -249,17 +250,29 @@ def get_random_factor(walls_already_built, wall_no):
     return random_factor
 
 
+def reset_node_colours():
+    global node_colours
+    node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
+
+
 def dfs_build(start_node_idx):
+    # reset_fence()
+    # print("dfs_config_build | N: ", cfg.N)
+    reset_node_colours()
     start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
     start_node_idx = get_fence_node_idx(start_row, start_col)
     max_wall_length = int(cfg.N * 2 / 3)
-    for _ in range(0, cfg.fence_elements):
+    for i in range(0, cfg.fence_elements):
+        if i >= 1:
+            start_row, start_col = int(0.8 * cfg.N), int(0.8 * cfg.N)
+            start_node_idx = get_fence_node_idx(start_row, start_col)
+            max_wall_length = int(cfg.N * 2 / 3)
         if bool(fence_border(start_node_idx)):
             print("[fence.py] [dfs_build] error: start_node_idx turned out to be at map border, illegal placement. "
                   "Please repeat the procedure.")
         dfs_visit(start_node_idx, max_wall_length, 0)
 
-    print("Fence", cfg.fence)
+    # print("Fence", cfg.fence)
 
 
 def dfs_visit(current_node, wall_no, walls_already_built):

@@ -38,3 +38,9 @@ def set_default_parameters():
     fence = [list() for _ in range((N + 1) ** 2)]
     fence_flag = True
     fence_elements = 1
+
+
+def redeclare_fence():
+    global fence, fence_elements
+    fence = [list() for _ in range((N + 1) ** 2)]
+    fence_elements = 1
