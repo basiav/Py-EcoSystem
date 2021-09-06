@@ -48,7 +48,7 @@ class Plot:
         plot.window.blit(scaled_plot_surface, (plot.width, 0))
 
     def render_text(self, my_font, plot):
-        text_bg_surf = pygame.Surface((plot.width_scale * 7, plot.height_scale + 30))
+        text_bg_surf = pygame.Surface((abs((plot.window.get_width() - plot.width) * 3 // 4), plot.height // 12))
         active_threads_text_line = GUIElements.TextLine(my_font, plot, colours['white'],
                                                         plot.width + abs((plot.window.get_width() - plot.width) // 5),
                                                         plot.height * 0.7, text_bg_surf, active_threads_string())
