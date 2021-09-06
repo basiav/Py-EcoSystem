@@ -13,7 +13,9 @@ colours = {'olive': (100, 100, 0),
            'black': (0, 0, 0),
            'dark_raspberry': "#c94c4c",
            'blue_1': "#587e76",
-           'blue_2': "#588c7e"}
+           'blue_2': "#588c7e",
+           'another': "#ffffd2",
+           'another_2': "#FFF4CB"}
 
 
 def get_lwd():
@@ -58,9 +60,13 @@ class Plot:
         plot.window.blit(plot.legend, (plot.width + abs((plot.window.get_width() - plot.width) // 4),
                                        plot.height // 2 * 1.075))
 
-    def draw_olive_bg(self):
+    def draw_olive_bg(self, **kwargs):
         surface = pygame.Surface((self.window.get_width(), self.window.get_height()), pygame.SRCALPHA)
-        surface.set_alpha(150)  # Or 150
+        alpha = kwargs.get('alpha')
+        other_alpha_value = 'alpha' in kwargs
+        if not other_alpha_value:
+            alpha = 150
+        surface.set_alpha(alpha)  # 150
         pygame.draw.rect(surface, colours['olive'], surface.get_rect())
         self.window.blit(surface, (0, 0))
 
@@ -240,6 +246,24 @@ class StartMenu(Plot):
         self.wolf_male = pygame.transform.scale(wolf_male_img, (int(self.width_scale), int(self.height_scale)))
         self.wolf_female = pygame.transform.scale(wolf_female_img, (int(self.width_scale), int(self.height_scale)))
 
+    def get_title_picture(self):
+        dims = (self.window.get_width(), self.window.get_height())
+        title_img = pygame.image.load('resources/py_ecosystem.png')
+        title_img_scaled = pygame.transform.scale(title_img,
+                                                  (int(int(dims[0]) * 0.25),
+                                                   (int(dims[0] * 0.25 * title_img.get_height() //
+                                                        title_img.get_width()))))
+        return title_img_scaled
+
+    def get_additional_picture(self):
+        dims = (self.window.get_width(), self.window.get_height())
+        title_img = pygame.image.load('resources/supp_threading.png')
+        title_img_scaled = pygame.transform.scale(title_img,
+                                                  (int(int(dims[0]) * 0.25),
+                                                   (int(dims[0] * 0.25 * title_img.get_height() //
+                                                        title_img.get_width()))))
+        return title_img_scaled
+
     def reenter_start_menu(self):
         self.quit = False
 
@@ -258,7 +282,7 @@ class StartMenu(Plot):
                                                      (settings_button_dims[0], (int(settings_button_dims[
                                                                                         0] * settings_img.get_height() // settings_img.get_width()))))
 
-        start_button_dims = (200, 200)
+        start_button_dims = settings_button_dims
         start_button_pos = (self.width // 2, settings_button_pos[1] + settings_button_dims[1])
         start_button_active_colour = colours['olive']
         start_button_highlight_colour = colours['white']
@@ -269,13 +293,32 @@ class StartMenu(Plot):
                                                       (start_button_dims[0], (int(start_button_dims[
                                                                                       0] * start_sim_img.get_height() // start_sim_img.get_width()))))
 
+        py_ecosystem_surface = pygame.Surface((settings_button_dims[0], settings_button_dims[1]), pygame.SRCALPHA)
+        py_ecosystem_surface.set_alpha(100)
+        pygame.draw.rect(py_ecosystem_surface, colours['another_2'], py_ecosystem_surface.get_rect())
+
+        supp_threading_surface = pygame.Surface((settings_button_dims[0], settings_button_dims[1]), pygame.SRCALPHA)
+        supp_threading_surface.set_alpha(100)
+        pygame.draw.rect(supp_threading_surface, colours['another_2'], supp_threading_surface.get_rect())
+
         while not self.start_game:
             pygame.time.delay(1)
 
-            # surface = pygame.Surface((self.width_scale, self.height_scale))
+            title_img_scaled = self.get_title_picture()
+            threading_img_scaled = self.get_additional_picture()
 
             self.window.blit(self.bg, (0, 0))
-            # self.draw_olive_bg()
+            self.window.blit(py_ecosystem_surface, (settings_button_pos[0] + settings_button_dims[0],
+                                                    settings_button_pos[1]))
+            self.window.blit(supp_threading_surface, (settings_button_pos[0], start_button_pos[1]))
+            try:
+                self.window.blit(title_img_scaled, (settings_button_pos[0] + settings_button_dims[0],
+                                                    settings_button_pos[1] + 50))
+                self.window.blit(threading_img_scaled, (settings_button_pos[0],
+                                                        start_button_pos[1] + 40))
+            except:
+                print("[plot.py] [StartMenu] [update] error: error with displaying img. "
+                      "(probably a problem with negative y value)")
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
             click = False
