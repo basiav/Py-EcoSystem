@@ -1,3 +1,6 @@
+import os
+os.chdir('../')
+
 import config as cfg
 from common import pygame, Directions, time
 from animals import *

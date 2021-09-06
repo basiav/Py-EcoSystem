@@ -1,6 +1,8 @@
 #!/usr/bin/python3
-import threading
+import sys
+sys.path.append('../')
 
+import threading
 from common import plt
 from animals import *
 from fence import *
