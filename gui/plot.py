@@ -9,12 +9,9 @@ from gui.gui_elements import GUIElements, active_threads_string, total_animals_n
 
 colours = {'olive': (100, 100, 0),
            'olive_2': "#4f5500",
-           'dark_olive': (150, 150, 0),
-           'dark_olive_2': "#5d7151",
            'pink': "#840032",
            'white': (255, 255, 255),
            'black': (0, 0, 0),
-           'dark_raspberry': "#c94c4c",
            'blue_1': "#587e76",
            'blue_2': "#588c7e",
            'another': "#ffffd2",
