@@ -86,8 +86,8 @@ class PlotPhotos(Plot):
         pygame.font.init()
         pygame.display.set_caption("Py-Ecosystem - Visualisation")
 
-        bg_img = pygame.image.load('resources/grass_2.jpg')
-        rabbit_img = pygame.image.load('resources/rabbit2.jpg')
+        bg_img = pygame.image.load('resources/grass.jpg')
+        rabbit_img = pygame.image.load('resources/rabbit.jpg')
         wolf_male_img = pygame.image.load('resources/wolf_male.jpg')
         wolf_female_img = pygame.image.load('resources/wolf_female.jpg')
 
@@ -235,8 +235,8 @@ class StartMenu(Plot):
         pygame.init()
         pygame.font.init()
 
-        bg_img = pygame.image.load('resources/grass_2.jpg')
-        rabbit_img = pygame.image.load('resources/rabbit2.jpg')
+        bg_img = pygame.image.load('resources/grass.jpg')
+        rabbit_img = pygame.image.load('resources/rabbit.jpg')
         wolf_male_img = pygame.image.load('resources/wolf_male.jpg')
         wolf_female_img = pygame.image.load('resources/wolf_female.jpg')
 
@@ -362,8 +362,8 @@ class SettingsMenu(Plot):
         self.do_continue = True
         self.start_menu = previous_start_menu
 
-        bg_img = pygame.image.load('resources/grass_2.jpg')
-        rabbit_img = pygame.image.load('resources/rabbit2.jpg')
+        bg_img = pygame.image.load('resources/grass.jpg')
+        rabbit_img = pygame.image.load('resources/rabbit.jpg')
         wolf_male_img = pygame.image.load('resources/wolf_male.jpg')
         wolf_female_img = pygame.image.load('resources/wolf_female.jpg')
 
@@ -594,7 +594,7 @@ class MapMenu(Plot):
         self.map_ready = False
         self.settings_menu = settings_menu
 
-        bg_img = pygame.image.load('resources/grass_2.jpg')
+        bg_img = pygame.image.load('resources/grass.jpg')
         self.bg = pygame.transform.scale(bg_img, (self.width, self.height))
 
     def get_save_button(self, active_colour, start_x, start_y):
