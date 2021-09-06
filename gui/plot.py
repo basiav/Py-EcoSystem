@@ -4,6 +4,17 @@ from animals import *
 from fence import *
 from gui.gui_elements import GUIElements, active_threads_string, total_animals_no, create_legend, print_settings
 
+colours = {'olive': (100, 100, 0),
+           'olive_2': "#4f5500",
+           'dark_olive': (150, 150, 0),
+           'dark_olive_2': "#5d7151",
+           'pink': "#840032",
+           'white': (255, 255, 255),
+           'black': (0, 0, 0),
+           'dark_raspberry': "#c94c4c",
+           'blue_1': "#587e76",
+           'blue_2': "#588c7e"}
+
 
 def get_lwd():
     if cfg.N <= 20:
@@ -33,10 +44,10 @@ class Plot:
 
     def render_text(self, my_font, plot):
         text_bg_surf = pygame.Surface((plot.width_scale * 7, plot.height_scale + 30))
-        active_threads_text_line = GUIElements.TextLine(my_font, plot, (255, 255, 255),
+        active_threads_text_line = GUIElements.TextLine(my_font, plot, colours['white'],
                                                         plot.width + abs((plot.window.get_width() - plot.width) // 5),
                                                         plot.height * 0.7, text_bg_surf, active_threads_string())
-        total_animals_text_line = GUIElements.TextLine(my_font, plot, (255, 255, 255),
+        total_animals_text_line = GUIElements.TextLine(my_font, plot, colours['white'],
                                                        plot.width + abs((plot.window.get_width() - plot.width) // 5),
                                                        plot.height * 0.7 + 30, text_bg_surf, total_animals_no(),
                                                        bg=False)
@@ -62,7 +73,6 @@ class PlotPhotos(Plot):
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption("Visualisation")
-        # self.window = pygame.display.set_mode((self.width, self.height))
 
         bg_img = pygame.image.load('resources/grass_2.jpg')
         rabbit_img = pygame.image.load('resources/rabbit2.jpg')
@@ -80,7 +90,7 @@ class PlotPhotos(Plot):
         pause_button_dims = (105, 70)
         pause_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
         pause_button_active_colour = active_colour
-        pause_button_highlight_colour = (255, 255, 255)
+        pause_button_highlight_colour = colours['white']
         pause_button = GUIElements.Button(pause_button_pos, pause_button_dims, pause_button_active_colour,
                                           pause_button_highlight_colour)
         pause_img = pygame.image.load('resources/pause.png')
@@ -93,7 +103,7 @@ class PlotPhotos(Plot):
         resume_button_dims = (105, 70)
         resume_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8), self.height * 0.815)
         resume_button_active_colour = active_colour
-        resume_button_highlight_colour = (255, 255, 255)
+        resume_button_highlight_colour = colours['white']
         resume_button = GUIElements.Button(resume_button_pos, resume_button_dims, resume_button_active_colour,
                                            resume_button_highlight_colour)
         resume_img = pygame.image.load('resources/resume.png')
@@ -106,7 +116,7 @@ class PlotPhotos(Plot):
         escape_button_dims = (105, 70)
         escape_button_pos = (self.width + abs((self.window.get_width() - self.width) // 8 * 4.5), self.height * 0.815)
         escape_button_active_colour = active_colour
-        escape_button_highlight_colour = (255, 255, 255)
+        escape_button_highlight_colour = colours['white']
         escape_button = GUIElements.Button(escape_button_pos, escape_button_dims, escape_button_active_colour,
                                            escape_button_highlight_colour)
         escape_img = pygame.image.load('resources/quit_return.png')
@@ -119,18 +129,13 @@ class PlotPhotos(Plot):
         pygame.time.delay(1)
 
         self.window.blit(self.bg, (0, 0))
-
-        # Colour Settings
-        blue_1 = "#587e76"
-        blue_2 = "#588c7e"
-        dark_raspberry = "#c94c4c"
-        olive = (100, 100, 0)
+        olive = colours['olive']
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
         click = False
 
         pause_button, pause_img_scaled = self.get_pause_button(olive)
-        resume_button, resume_img_scaled = self.get_resume_button(blue_2)
+        resume_button, resume_img_scaled = self.get_resume_button(colours['blue_2'])
         escape_button, escape_img_scaled = self.get_escape_button(olive)
 
         surface = pygame.Surface((self.width_scale, self.height_scale), pygame.SRCALPHA)
@@ -237,8 +242,8 @@ class StartMenu(Plot):
 
         settings_button_dims = (200, 200)
         settings_button_pos = (self.width // 2 - settings_button_dims[1], self.height // 4)
-        settings_button_active_colour = (100, 100, 0)
-        settings_button_highlight_colour = (255, 255, 255)
+        settings_button_active_colour = colours['olive']
+        settings_button_highlight_colour = colours['white']
         settings_button = GUIElements.Button(settings_button_pos, settings_button_dims,
                                              settings_button_active_colour,
                                              settings_button_highlight_colour)
@@ -249,8 +254,8 @@ class StartMenu(Plot):
 
         start_button_dims = (200, 200)
         start_button_pos = (self.width // 2, settings_button_pos[1] + settings_button_dims[1])
-        start_button_active_colour = (100, 100, 0)
-        start_button_highlight_colour = (255, 255, 255)
+        start_button_active_colour = colours['olive']
+        start_button_highlight_colour = colours['white']
         start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
                                           start_button_highlight_colour)
         start_sim_img = pygame.image.load('resources/start_sim_def_params.png')
@@ -327,7 +332,7 @@ class SettingsMenu(Plot):
     def get_map_button(self, active_colour, start_x, start_y):
         map_button_dims = (200, 70)
         map_button_active_colour = active_colour
-        map_button_highlight_colour = (255, 255, 255)
+        map_button_highlight_colour = colours['white']
         map_button = GUIElements.Button((start_x, start_y), map_button_dims, map_button_active_colour,
                                         map_button_highlight_colour)
         map_img = pygame.image.load('resources/map_settings.png')
@@ -345,10 +350,15 @@ class SettingsMenu(Plot):
                                                         title_img.get_width()))))
         return title_img_scaled
 
+    def draw_olive_bg(self):
+        surface = pygame.Surface((self.window.get_width(), self.window.get_height()), pygame.SRCALPHA)
+        surface.set_alpha(150)  # Or 150
+        pygame.draw.rect(surface, colours['olive'], surface.get_rect())
+        self.window.blit(surface, (0, 0))
+
     def update(self):
         slider_width, slider_height = 300, 6
-        # slider_colour = "#3e4444"  # gray
-        slider_colour = "#840032"  # pink
+        slider_colour = colours['pink']
         default_N = 10
 
         N_slider_x, N_slider_y = 100, self.height * 0.2
@@ -360,11 +370,8 @@ class SettingsMenu(Plot):
         slider_N = GUIElements.Slider(N_slider_x, N_slider_y, slider_width, slider_height, slider_colour)
         slider_rabbits = GUIElements.Slider(rabbits_no_slider_x, rabbits_no_slider_y, slider_width, slider_height,
                                             slider_colour)
-        # slider_colour = "#2F4F4F"
-        # slider_colour = (0, 0, 0)
-        # slider_colour = "#343a40"
-        # slider_colour = "#38040e"
-        # slider_colour = "#85182a"
+
+        olive = colours['olive_2']
 
         slider_wolves = GUIElements.Slider(wolves_no_slider_x, wolves_no_slider_y, slider_width, slider_height,
                                            slider_colour)
@@ -380,15 +387,15 @@ class SettingsMenu(Plot):
 
         button_dims = (200, 70)
 
-        map_button, map_img_scaled = self.get_map_button((100, 100, 0),
+        map_button, map_img_scaled = self.get_map_button(olive,
                                                          self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
                                                          wolf_reproduction_rate_slider_y + button_dims[1] // 4 * 3)
 
         start_button_dims = button_dims
         start_button_pos = (self.window.get_width() // 2 + button_dims[0] // 4,
                             (map_button.start_y + 1.5 * start_button_dims[1]))
-        start_button_active_colour = (100, 100, 0)
-        start_button_highlight_colour = (255, 255, 255)
+        start_button_active_colour = olive
+        start_button_highlight_colour = colours['white']
         start_button = GUIElements.Button(start_button_pos, start_button_dims, start_button_active_colour,
                                           start_button_highlight_colour)
         start_sim_img = pygame.image.load('resources/save_and_start_simulation.png')
@@ -399,8 +406,8 @@ class SettingsMenu(Plot):
         start_menu_button_dims = button_dims
         start_menu_button_pos = (self.window.get_width() // 4 - start_button_dims[0] // 2,
                                  (map_button.start_y + 1.5 * start_button_dims[1]))
-        start_menu_button_active_colour = (100, 100, 0)
-        start_menu_button_highlight_colour = (255, 255, 255)
+        start_menu_button_active_colour = olive
+        start_menu_button_highlight_colour = colours['white']
         start_menu_button = GUIElements.Button(start_menu_button_pos, start_menu_button_dims,
                                                start_menu_button_active_colour,
                                                start_menu_button_highlight_colour)
@@ -419,6 +426,7 @@ class SettingsMenu(Plot):
             pygame.time.delay(1)
 
             self.window.blit(self.bg, (0, 0))
+            self.draw_olive_bg()
 
             try:
                 self.window.blit(title_img_scaled, (self.window.get_width() // 4 - 15, -40))
@@ -438,7 +446,7 @@ class SettingsMenu(Plot):
 
             text_bg_surf = pygame.Surface((self.width_scale * 3, self.height_scale * 1.5))
             modified_N = slider_N.get_scaled_value()
-            text_N = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+            text_N = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, colours['white'],
                                           slider_N.start_x + slider_width * 1.1,
                                           N_slider_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
                                           "N: " + str(modified_N), bg=False)
@@ -446,7 +454,7 @@ class SettingsMenu(Plot):
 
             slider_rabbits.set_default_range(0, (1 * modified_N) // 2)
             modified_rabbits_no = slider_rabbits.get_scaled_value()
-            text_rabbits = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+            text_rabbits = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, colours['white'],
                                                 slider_rabbits.start_x + slider_width * 1.1,
                                                 slider_rabbits.start_y - slider_height * 5 // 2 + slider_height // 2,
                                                 text_bg_surf,
@@ -455,7 +463,7 @@ class SettingsMenu(Plot):
 
             slider_wolves.set_default_range(0, (1 * modified_N) // 2)
             modified_wolves_no = slider_wolves.get_scaled_value()
-            text_wolves = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+            text_wolves = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, colours['white'],
                                                slider_wolves.start_x + slider_width * 1.1,
                                                slider_wolves.start_y - slider_height * 5 // 2 + slider_height // 2,
                                                text_bg_surf,
@@ -465,7 +473,7 @@ class SettingsMenu(Plot):
             slider_rabbit_reproduction_rate.set_default_range(0, 1)
             rabbit_modified_reproduction_chances = slider_rabbit_reproduction_rate.get_scaled_value(decimal=True)
             text_rabbit_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self,
-                                                                    (255, 255, 255),
+                                                                    colours['white'],
                                                                     slider_rabbit_reproduction_rate.start_x + slider_width * 1.1,
                                                                     slider_rabbit_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2,
                                                                     text_bg_surf,
@@ -477,7 +485,7 @@ class SettingsMenu(Plot):
             slider_wolf_reproduction_rate.set_default_range(0, 1)
             wolf_modified_reproduction_chances = slider_wolf_reproduction_rate.get_scaled_value(decimal=True)
             text_wolf_reproduction_chances = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self,
-                                                                  (255, 255, 255),
+                                                                  colours['white'],
                                                                   slider_wolf_reproduction_rate.start_x + slider_width * 1.1,
                                                                   slider_wolf_reproduction_rate.start_y - slider_height * 5 // 2 + slider_height // 2,
                                                                   text_bg_surf,
@@ -558,7 +566,7 @@ class MapMenu(Plot):
     def get_save_button(self, active_colour, start_x, start_y):
         save_button_dims = (200, 70)
         save_button_active_colour = active_colour
-        save_button_highlight_colour = (255, 255, 255)
+        save_button_highlight_colour = colours['white']
         save_button = GUIElements.Button((start_x, start_y), save_button_dims, save_button_active_colour,
                                          save_button_highlight_colour)
         save_img = pygame.image.load('resources/save_and_back_to_settings.png')
@@ -578,8 +586,7 @@ class MapMenu(Plot):
         return map_img_scaled
 
     def get_fence_slider(self):
-        # slider_colour = "#3e4444"  # gray
-        slider_colour = "#840032"  # pink
+        slider_colour = colours['pink']
         slider_width, slider_height = 300, 6
         fence_slider_x, fence_slider_y = 160, self.height * 0.75
         min_fence_elements = 0
@@ -595,7 +602,7 @@ class MapMenu(Plot):
         slider_width, slider_height = 300, 6
         fence_slider_x, fence_slider_y = 160, self.height * 0.75
         modified_fence_elements = slider_fence.get_scaled_value()
-        text_fence = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, (255, 255, 255),
+        text_fence = GUIElements.TextLine(pygame.font.SysFont('arial', 20), self, colours['white'],
                                           slider_fence.start_x + slider_width * 1.1,
                                           fence_slider_y - slider_height * 5 // 2 + slider_height // 2, text_bg_surf,
                                           "Fence Islands: " + str(modified_fence_elements), bg=False)
@@ -611,7 +618,7 @@ class MapMenu(Plot):
         dfs_build(451)
 
     def draw_current_mazes(self):
-        olive = (100, 100, 0)
+        olive = colours['olive']
         lwd = get_lwd()
 
         maze_scale = 0.6
@@ -635,10 +642,10 @@ class MapMenu(Plot):
         self.window.blit(surface, map_upper_left_corner)
 
         for i in range(0, self.tiles):
-            pygame.draw.line(self.window, (0, 0, 0), map_upper_left_corner, map_upper_right_corner, lwd)
-            pygame.draw.line(self.window, (0, 0, 0), map_upper_left_corner, map_lower_left_corner, lwd)
-            pygame.draw.line(self.window, (0, 0, 0), map_lower_right_corner, map_upper_right_corner, lwd)
-            pygame.draw.line(self.window, (0, 0, 0), map_lower_left_corner, map_lower_right_corner, lwd)
+            pygame.draw.line(self.window, colours['black'], map_upper_left_corner, map_upper_right_corner, lwd)
+            pygame.draw.line(self.window, colours['black'], map_upper_left_corner, map_lower_left_corner, lwd)
+            pygame.draw.line(self.window, colours['black'], map_lower_right_corner, map_upper_right_corner, lwd)
+            pygame.draw.line(self.window, colours['black'], map_lower_left_corner, map_lower_right_corner, lwd)
 
             for j in range(0, self.tiles):
                 current_fence_node = get_fence_node_idx(i, j)
@@ -649,20 +656,15 @@ class MapMenu(Plot):
                                        get_fence_node_dirs(current_fence_node)[1] * height_scale + y_translation_vector
                     end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * width_scale + x_translation_vector, \
                                    get_fence_node_dirs(neighbour_node)[1] * height_scale + y_translation_vector
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                    pygame.draw.line(self.window, colours['black'], (start_x, start_y), (end_x, end_y), lwd)
 
     def update(self):
         pygame.display.set_caption("Map Settings")
-        # Colour Settings
-        blue_1 = "#587e76"
-        blue_2 = "#588c7e"
-        dark_raspberry = "#c94c4c"
-        olive = (100, 100, 0)
 
         title_img_scaled = self.get_title_picture()
 
         button_dims = (200, 70)
-        save_button, save_img_scaled = self.get_save_button((100, 100, 0),
+        save_button, save_img_scaled = self.get_save_button(colours['olive'],
                                                             self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
                                                             self.window.get_height() * 0.755 + button_dims[1] // 4 * 3)
         slider_fence = self.get_fence_slider()
