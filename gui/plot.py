@@ -58,6 +58,12 @@ class Plot:
         plot.window.blit(plot.legend, (plot.width + abs((plot.window.get_width() - plot.width) // 4),
                                        plot.height // 2 * 1.075))
 
+    def draw_olive_bg(self):
+        surface = pygame.Surface((self.window.get_width(), self.window.get_height()), pygame.SRCALPHA)
+        surface.set_alpha(150)  # Or 150
+        pygame.draw.rect(surface, colours['olive'], surface.get_rect())
+        self.window.blit(surface, (0, 0))
+
     def quit_plot(self):
         self.quit = True
         pygame.quit()
@@ -269,6 +275,7 @@ class StartMenu(Plot):
             # surface = pygame.Surface((self.width_scale, self.height_scale))
 
             self.window.blit(self.bg, (0, 0))
+            # self.draw_olive_bg()
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
             click = False
@@ -349,12 +356,6 @@ class SettingsMenu(Plot):
                                                    (int(dims[0] * 0.5 * title_img.get_height() //
                                                         title_img.get_width()))))
         return title_img_scaled
-
-    def draw_olive_bg(self):
-        surface = pygame.Surface((self.window.get_width(), self.window.get_height()), pygame.SRCALPHA)
-        surface.set_alpha(150)  # Or 150
-        pygame.draw.rect(surface, colours['olive'], surface.get_rect())
-        self.window.blit(surface, (0, 0))
 
     def update(self):
         slider_width, slider_height = 300, 6
@@ -664,7 +665,7 @@ class MapMenu(Plot):
         title_img_scaled = self.get_title_picture()
 
         button_dims = (200, 70)
-        save_button, save_img_scaled = self.get_save_button(colours['olive'],
+        save_button, save_img_scaled = self.get_save_button(colours['olive_2'],
                                                             self.window.get_width() // 2 - button_dims[0] // 2 * 1.2,
                                                             self.window.get_height() * 0.755 + button_dims[1] // 4 * 3)
         slider_fence = self.get_fence_slider()
@@ -673,6 +674,7 @@ class MapMenu(Plot):
             pygame.time.delay(1)
 
             self.window.blit(self.bg, (0, 0))
+            self.draw_olive_bg()
 
             try:
                 self.window.blit(title_img_scaled, (0, -140))
