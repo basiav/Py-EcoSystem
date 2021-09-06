@@ -84,7 +84,7 @@ class PlotPhotos(Plot):
 
         pygame.init()
         pygame.font.init()
-        pygame.display.set_caption("Visualisation")
+        pygame.display.set_caption("Py-Ecosystem - Visualisation")
 
         bg_img = pygame.image.load('resources/grass_2.jpg')
         rabbit_img = pygame.image.load('resources/rabbit2.jpg')
@@ -234,7 +234,6 @@ class StartMenu(Plot):
 
         pygame.init()
         pygame.font.init()
-        pygame.display.set_caption("Start Menu")
 
         bg_img = pygame.image.load('resources/grass_2.jpg')
         rabbit_img = pygame.image.load('resources/rabbit2.jpg')
@@ -250,8 +249,8 @@ class StartMenu(Plot):
         dims = (self.window.get_width(), self.window.get_height())
         title_img = pygame.image.load('resources/py_ecosystem.png')
         title_img_scaled = pygame.transform.scale(title_img,
-                                                  (int(int(dims[0]) * 0.25),
-                                                   (int(dims[0] * 0.25 * title_img.get_height() //
+                                                  (int(int(dims[0]) * 0.31),
+                                                   (int(dims[0] * 0.31 * title_img.get_height() //
                                                         title_img.get_width()))))
         return title_img_scaled
 
@@ -259,8 +258,8 @@ class StartMenu(Plot):
         dims = (self.window.get_width(), self.window.get_height())
         title_img = pygame.image.load('resources/supp_threading.png')
         title_img_scaled = pygame.transform.scale(title_img,
-                                                  (int(int(dims[0]) * 0.25),
-                                                   (int(dims[0] * 0.25 * title_img.get_height() //
+                                                  (int(int(dims[0]) * 0.31),
+                                                   (int(dims[0] * 0.31 * title_img.get_height() //
                                                         title_img.get_width()))))
         return title_img_scaled
 
@@ -268,10 +267,10 @@ class StartMenu(Plot):
         self.quit = False
 
     def update(self):
-        pygame.display.set_caption("Start Menu")
+        pygame.display.set_caption("Py-Ecosystem - Start Menu")
 
-        settings_button_dims = (200, 200)
-        settings_button_pos = (self.width // 2 - settings_button_dims[1], self.height // 4)
+        settings_button_dims = (250, 250)
+        settings_button_pos = (self.width // 2 - settings_button_dims[1], self.height // 7)
         settings_button_active_colour = colours['olive']
         settings_button_highlight_colour = colours['white']
         settings_button = GUIElements.Button(settings_button_pos, settings_button_dims,
@@ -311,23 +310,19 @@ class StartMenu(Plot):
             self.window.blit(py_ecosystem_surface, (settings_button_pos[0] + settings_button_dims[0],
                                                     settings_button_pos[1]))
             self.window.blit(supp_threading_surface, (settings_button_pos[0], start_button_pos[1]))
-            try:
-                self.window.blit(title_img_scaled, (settings_button_pos[0] + settings_button_dims[0],
-                                                    settings_button_pos[1] + 50))
-                self.window.blit(threading_img_scaled, (settings_button_pos[0],
-                                                        start_button_pos[1] + 40))
-            except:
-                print("[plot.py] [StartMenu] [update] error: error with displaying img. "
-                      "(probably a problem with negative y value)")
+            self.window.blit(title_img_scaled, (settings_button_pos[0] + settings_button_dims[0],
+                                                settings_button_pos[1] + 62))
+            self.window.blit(threading_img_scaled, (settings_button_pos[0],
+                                                    start_button_pos[1] + 50))
 
             mouse_x, mouse_y = pygame.mouse.get_pos()
             click = False
 
             settings_button.render(self.window)
-            self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.3))
+            self.window.blit(settings_img_scaled, (settings_button_pos[0], settings_button_pos[1] * 1.7))
 
             start_button.render(self.window)
-            self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.15))
+            self.window.blit(start_sim_img_scaled, (start_button_pos[0], start_button_pos[1] * 1.2))
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -366,8 +361,6 @@ class SettingsMenu(Plot):
         self.settings_ready = False
         self.do_continue = True
         self.start_menu = previous_start_menu
-
-        pygame.display.set_caption("Settings Menu")
 
         bg_img = pygame.image.load('resources/grass_2.jpg')
         rabbit_img = pygame.image.load('resources/rabbit2.jpg')
@@ -465,7 +458,7 @@ class SettingsMenu(Plot):
         memorise_fence = False
 
         while not self.settings_ready and self.do_continue:
-            pygame.display.set_caption("Settings Menu")
+            pygame.display.set_caption("Py-Ecosystem - Settings Menu")
 
             pygame.time.delay(1)
 
@@ -601,10 +594,7 @@ class MapMenu(Plot):
         self.map_ready = False
         self.settings_menu = settings_menu
 
-        pygame.display.set_caption("Map Settings")
-
         bg_img = pygame.image.load('resources/grass_2.jpg')
-
         self.bg = pygame.transform.scale(bg_img, (self.width, self.height))
 
     def get_save_button(self, active_colour, start_x, start_y):
@@ -703,7 +693,7 @@ class MapMenu(Plot):
                     pygame.draw.line(self.window, colours['black'], (start_x, start_y), (end_x, end_y), lwd)
 
     def update(self):
-        pygame.display.set_caption("Map Settings")
+        pygame.display.set_caption("Py-Ecosystem - Map Settings")
 
         title_img_scaled = self.get_title_picture()
 
