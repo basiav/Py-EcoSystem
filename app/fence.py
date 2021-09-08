@@ -269,7 +269,9 @@ def dfs_build(start_node_idx):
             max_wall_length = int(cfg.N * 2 / 3)
         if bool(fence_border(start_node_idx)):
             print("[fence.py] [dfs_build] error: start_node_idx turned out to be at map border, illegal placement. "
-                  "Please repeat the procedure.")
+                  "Repeat the procedure.")
+            i -= 1
+            continue
         dfs_visit(start_node_idx, max_wall_length, 0)
 
     # print("Fence", cfg.fence)
