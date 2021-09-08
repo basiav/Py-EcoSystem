@@ -140,8 +140,9 @@ def main():
     while not escape:
         start_menu.update()
         if start_menu.start_game:
+            if not start_menu.memorise_fence:
+                create_sample_fence()
             print("[MAIN] Starting simulation!")
-            create_sample_fence()
             res = start_simulation()
             print("[MAIN] Simulation over")
             res.quit_plot()

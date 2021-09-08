@@ -231,6 +231,7 @@ class StartMenu(Plot):
         window = pygame.display.set_mode((width, height))
         super().__init__(window, width, height)
         self.start_game = False
+        self.memorise_fence = False
 
         pygame.init()
         pygame.font.init()
@@ -567,6 +568,7 @@ class SettingsMenu(Plot):
                     print("[SETTINGS MENU] start_game has just been clicked!")
                     print_settings()
                     self.start_menu.start_game = True
+                    self.start_menu.memorise_fence = memorise_fence
                     self.settings_ready = True
 
                 elif start_menu_button.collidepoint(mouse_x, mouse_y):

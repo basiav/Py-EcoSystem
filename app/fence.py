@@ -297,7 +297,9 @@ def dfs_visit(current_node, wall_no, walls_already_built):
                 node_colours[chosen_neighbour] is Colour.White:
             build_vertex(current_node, chosen_neighbour)
             dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1)
+            if len(possible_dirs_set) <= 1:
+                return
 
-        if len(possible_dirs_set) <= 1:
-            # node_colours[current_node] = Colour.Black
-            return
+        # if len(possible_dirs_set) <= 1:
+        #     # node_colours[current_node] = Colour.Black
+        #     return
