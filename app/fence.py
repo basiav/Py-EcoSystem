@@ -255,6 +255,14 @@ def reset_node_colours():
     node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
 
+def get_random_corner_fence_location(randint_1, randint_2):
+    start_row = random.randint(int(0.1 * cfg.N), int(0.5 * cfg.N)) if randint_1 % 2 == 0 \
+        else random.randint(int(0.5 * cfg.N), int(0.9 * cfg.N))
+    start_col = random.randint(int(0.1 * cfg.N), int(0.5 * cfg.N)) if randint_2 % 2 == 0 \
+        else random.randint(int(0.5 * cfg.N), int(0.9 * cfg.N))
+    return start_row, start_col
+
+
 def dfs_build(start_node_idx):
     # reset_fence()
     # print("dfs_config_build | N: ", cfg.N)
@@ -264,7 +272,7 @@ def dfs_build(start_node_idx):
     max_wall_length = int(cfg.N * 2 / 3)
     for i in range(0, cfg.fence_elements):
         if i >= 1:
-            start_row, start_col = int(0.8 * cfg.N), int(0.8 * cfg.N)
+            start_row, start_col = get_random_corner_fence_location(random.randint(0, 1), random.randint(0, 1))
             start_node_idx = get_fence_node_idx(start_row, start_col)
             max_wall_length = int(cfg.N * 2 / 3)
         if bool(fence_border(start_node_idx)):
