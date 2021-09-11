@@ -629,7 +629,7 @@ class MapMenu(Plot):
 
         slider_fence = GUIElements.Slider(fence_slider_x, fence_slider_y, slider_width, slider_height, slider_colour)
         slider_fence.set_default_range(min_fence_elements,
-                                       (min_fence_elements + 1) * 3)  # FIX THIS, HOW MANY MAZE ISLANDS MAX???
+                                       (min_fence_elements + 1) * 4)
 
         return slider_fence
 

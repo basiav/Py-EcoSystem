@@ -4,7 +4,7 @@ terrain = [[None for _ in range(N)] for _ in range(N)]
 rabbit_no = 30
 wolf_no = 20
 
-rabbit_reproduction_chances = 30
+rabbit_reproduction_chances = 25
 wolf_reproduction_chances = 10
 
 stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
@@ -29,7 +29,7 @@ def set_default_parameters():
     rabbit_no = 30
     wolf_no = 20
 
-    rabbit_reproduction_chances = 30
+    rabbit_reproduction_chances = 25
     wolf_reproduction_chances = 10
 
     stats = {'rabbits': 0, 'wolves_females': 0, 'wolves_males': 0}
