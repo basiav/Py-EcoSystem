@@ -182,8 +182,13 @@ class PlotPhotos(Plot):
                     end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
                                    get_fence_node_dirs(neighbour_node)[1] * self.height_scale
                     # if (start_x, start_y) != (i, j) and (end_x, end_y) != ():
-                    colour = [random.randint(0, 255) for _ in range(3)]
-                    pygame.draw.line(self.window, (0, 0, 0), (start_x, start_y), (end_x, end_y), lwd)
+                    if cfg.specials[neighbour_node] and cfg.specials[current_fence_node]:
+                        colour = colours['pink']
+                        lwd = 3
+                    else:
+                        colour = (0, 0, 0)
+                        lwd = get_lwd()
+                    pygame.draw.line(self.window, colour, (start_x, start_y), (end_x, end_y), lwd)
 
         self.render_plot(plot_img, canvas, self)
 

@@ -14,6 +14,8 @@ fence = [list() for _ in range((N + 1) ** 2)]
 fence_flag = True
 fence_elements = 1
 
+specials = [None for _ in range((N + 1) ** 2)]
+
 
 def get_aliased_global_variable_names():
     global N, terrain, rabbit_no, wolf_no, rabbit_reproduction_chances, wolf_reproduction_chances, stats, stats_arrs
@@ -22,7 +24,7 @@ def get_aliased_global_variable_names():
 
 def set_default_parameters():
     global N, terrain, rabbit_no, wolf_no, rabbit_reproduction_chances, wolf_reproduction_chances, stats, stats_arrs
-    global fence, fence_flag, fence_elements
+    global fence, fence_flag, fence_elements, specials
     N = 30
     terrain = [[None for _ in range(N)] for _ in range(N)]
 
@@ -38,6 +40,8 @@ def set_default_parameters():
     fence = [list() for _ in range((N + 1) ** 2)]
     fence_flag = True
     fence_elements = 1
+
+    specials = [None for _ in range((N + 1) ** 2)]
 
 
 def redeclare_fence():

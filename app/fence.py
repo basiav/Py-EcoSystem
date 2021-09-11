@@ -235,7 +235,7 @@ def delete_wall(start_node, end_node):
     allowed_proximity_directions = [Directions.Up, Directions.Right, Directions.Down, Directions.Left]
     if neighbours_relations(start_node, end_node) not in allowed_proximity_directions and \
             neighbours_relations(end_node, start_node) not in allowed_proximity_directions:
-        error_exit("fence.py", "build_vertex", "Given nodes are not neighbours, thus wall cannot be deleted")
+        error_exit("fence.py", "delete_wall", "Given nodes are not neighbours, thus wall cannot be deleted")
     elif end_node in cfg.fence[start_node]:
         delete_vertex(start_node, end_node)
     elif start_node in cfg.fence[end_node]:
@@ -268,9 +268,11 @@ def reset_node_colours():
     node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
 
-def reset_parents():
-    global parents
+def reset_parents_and_children():
+    global parents, children
     parents = [None for _ in range((cfg.N + 1) ** 2)]
+    children = [None for _ in range((cfg.N + 1) ** 2)]
+    cfg.specials = [False for _ in range((cfg.N + 1) ** 2)]
 
 
 def get_random_corner_fence_location(randint_1, randint_2):
@@ -281,11 +283,23 @@ def get_random_corner_fence_location(randint_1, randint_2):
     return start_row, start_col
 
 
+def get_node_colour(node_idx):
+    walls_no = 0
+    for neighbour in cfg.fence[node_idx]:
+        if check_if_wall_exists(neighbour, node_idx):
+            walls_no += 1
+    if walls_no == 1 or walls_no == 2:
+        return Colour.Grey
+    if walls_no == 3:
+        return Colour.Black
+    return Colour.White
+
+
 def dfs_build(start_node_idx):
     # reset_fence()
     # print("dfs_config_build | N: ", cfg.N)
     reset_node_colours()
-    reset_parents()
+    reset_parents_and_children()
     start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
     start_node_idx = get_fence_node_idx(start_row, start_col)
     parents[start_node_idx] = start_node_idx
@@ -380,6 +394,8 @@ def dfs_visit(current_node, wall_no, walls_already_built):
 
 def get_maze_path(start_node, end_node, start_node_idx):
     first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
+    if not first_common_parent:
+        return
     node_with_shorter_path = first_common_parent["node_with_shorter_path"]
     node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
     first_common_node_idx = first_common_parent["first_common_idx"]
@@ -391,31 +407,41 @@ def get_maze_path(start_node, end_node, start_node_idx):
     reverse_path(node_with_shorter_path, first_common_node_idx)
     print_reversed_path(first_common_node_idx, node_with_shorter_path)
 
-    nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, total_length)
+    nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
+                                       total_length)
     print("Nodes path", nodes_path)
 
-    start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path,
-                                                0, total_length - 1)[1]
-    next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path,
-                                          0, total_length - 1)[1]
+    start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
+    next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
     if next_black_node in cfg.fence[start_next_black_node]:
         starting_node = next_black_node
+        i = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[2]
     else:
         starting_node = start_next_black_node
+        i = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[2]
     if node_colours[starting_node] is not Colour.Black:
         error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
     print("Starting node", starting_node, node_colours[starting_node])
 
-    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path,
-                                                       0, total_length - 1)
-    print(previous_node, starting_node)
+    ending_node = get_closest_black_node(end_node)
+    print("Ending node", ending_node, node_colours[ending_node])
 
-    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path,
-                                                       0, total_length - 1)
-    print(previous_node, starting_node)
+    while i < len(nodes_path):
+        previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
+        print(previous_node, starting_node)
 
-    if previous_node and starting_node:
-        delete_wall(previous_node, starting_node)
+        # if previous_node == starting_node:
+        #     break
+
+        previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
+        print(previous_node, starting_node)
+
+        if previous_node and starting_node:
+            delete_wall(previous_node, starting_node)
+            print("Wall deleted")
+
+    for node in nodes_path:
+        cfg.specials[node] = True
 
 
 def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, length):
@@ -432,21 +458,28 @@ def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_wi
         first_common_node_idx = children[first_common_node_idx]
         i += 1
 
-    print("i", i)
+    # print("i", i)
     joined_path[i] = node_with_shorter_path
 
     return joined_path
 
 
-def get_next_black_node(current_node, previous_node, nodes_path, i, max_len):
+def get_next_black_node(current_node, previous_node, nodes_path, i):
     global node_colours
-    if current_node < 0 or current_node > (cfg.N + 1) ** 2 or node_colours[current_node] is Colour.White or i >= max_len:
-        return previous_node, previous_node
+    if current_node < 0 or current_node > (cfg.N + 1) ** 2 \
+            or node_colours[current_node] is Colour.White or i >= len(nodes_path) - 1:
+        return previous_node, previous_node, i
     if node_colours[current_node] is Colour.Black:
-        return previous_node, current_node
-    if nodes_path[i] != current_node:
-        return get_next_black_node(nodes_path[i + 1], current_node, nodes_path, i + 1, max_len)
-    return current_node, current_node
+        return previous_node, current_node, i
+    else:
+        return get_next_black_node(nodes_path[i + 1], current_node, nodes_path, i + 1)
+
+
+def get_closest_black_node(node_idx):
+    while node_colours[node_idx] is not Colour.White and node_idx != parents[node_idx]:
+        if node_colours[node_idx] is Colour.Black:
+            return node_idx
+        node_idx = parents[node_idx]
 
 
 def get_parent_path_length(child_node, parent_node):
@@ -500,7 +533,7 @@ def reverse_path(node_beginning, node_end):
     global parents, children
     if node_beginning == node_end:
         # children[node_beginning] = node_beginning
-        print("End point | CHILD of ", node_beginning, "is",  children[node_beginning])
+        print("End point | CHILD of ", node_beginning, "is", children[node_beginning])
         return
     children[parents[node_beginning]] = node_beginning
     print("CHILD of ", node_beginning, "is", children[node_beginning])
