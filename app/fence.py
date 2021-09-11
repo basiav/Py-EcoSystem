@@ -386,15 +386,18 @@ def get_maze_path(start_node, end_node, start_node_idx):
     print("first_common_node_idx", first_common_node_idx)
     shorter_path_length = first_common_parent["path_length"]
     longer_path_length = get_parent_path_length(node_with_longer_path, first_common_node_idx)
+    total_length = shorter_path_length + longer_path_length
 
     reverse_path(node_with_shorter_path, first_common_node_idx)
     print_reversed_path(first_common_node_idx, node_with_shorter_path)
 
-    nodes_path = [None for _ in range(0, shorter_path_length + longer_path_length + 1)]
-    # nodes_path =
+    nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, total_length)
+    print("Nodes path", nodes_path)
 
-    start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path)[1]
-    next_black_node = get_next_black_node(start_next_black_node, start_next_black_node)[1]
+    start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path,
+                                                0, total_length - 1)[1]
+    next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path,
+                                          0, total_length - 1)[1]
     if next_black_node in cfg.fence[start_next_black_node]:
         starting_node = next_black_node
     else:
@@ -403,31 +406,51 @@ def get_maze_path(start_node, end_node, start_node_idx):
         error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
     print("Starting node", starting_node, node_colours[starting_node])
 
-    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path)
+    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path,
+                                                       0, total_length - 1)
     print(previous_node, starting_node)
 
-    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path)
+    previous_node, starting_node = get_next_black_node(parents[starting_node], starting_node, nodes_path,
+                                                       0, total_length - 1)
     print(previous_node, starting_node)
 
     if previous_node and starting_node:
         delete_wall(previous_node, starting_node)
 
 
-# def get_joined_nodes_path()
+def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, length):
+    joined_path = [_ for _ in range(0, length - 1)]
+    i = 0
 
-def get_next_black_node(current_node, previous_node, nodes_path):
+    while node_with_longer_path != first_common_node_idx:
+        joined_path[i] = node_with_longer_path
+        node_with_longer_path = parents[node_with_longer_path]
+        i += 1
+
+    while first_common_node_idx != node_with_shorter_path:
+        joined_path[i] = first_common_node_idx
+        first_common_node_idx = children[first_common_node_idx]
+        i += 1
+
+    print("i", i)
+    joined_path[i] = node_with_shorter_path
+
+    return joined_path
+
+
+def get_next_black_node(current_node, previous_node, nodes_path, i, max_len):
     global node_colours
-    if current_node < 0 or current_node > (cfg.N + 1) ** 2 or node_colours[current_node] is Colour.White:
+    if current_node < 0 or current_node > (cfg.N + 1) ** 2 or node_colours[current_node] is Colour.White or i >= max_len:
         return previous_node, previous_node
     if node_colours[current_node] is Colour.Black:
         return previous_node, current_node
-    if nodes_path[current_node] != current_node:
-        return get_next_black_node(nodes_path[current_node], current_node, nodes_path)
+    if nodes_path[i] != current_node:
+        return get_next_black_node(nodes_path[i + 1], current_node, nodes_path, i + 1, max_len)
     return current_node, current_node
 
 
 def get_parent_path_length(child_node, parent_node):
-    length = 0
+    length = 1
     while child_node != parent_node:
         length += 1
         child_node = parents[child_node]
