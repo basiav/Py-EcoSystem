@@ -285,14 +285,20 @@ def get_random_corner_fence_location(randint_1, randint_2):
 
 def get_node_colour(node_idx):
     walls_no = 0
-    for neighbour in cfg.fence[node_idx]:
-        if check_if_wall_exists(neighbour, node_idx):
+    for dir in Directions:
+        x, y = get_fence_node_dirs(node_idx)
+        neighbour = get_node_neighbour(dir, x, y)
+        if neighbour and check_if_wall_exists(neighbour, node_idx):
             walls_no += 1
+    colour = Colour.White
     if walls_no == 1 or walls_no == 2:
-        return Colour.Grey
-    if walls_no == 3:
-        return Colour.Black
-    return Colour.White
+        colour = Colour.Grey
+    elif walls_no == 3 or walls_no == 4:
+        colour = Colour.Black
+    if colour != node_colours[node_idx]:
+        print("[Error in colours]", "node_idx", node_idx, "walls_no", walls_no, node_colours[node_idx])
+    return colour
+
 
 
 def dfs_build(start_node_idx):
@@ -320,6 +326,9 @@ def dfs_build(start_node_idx):
             continue
         dfs_visit(start_node_idx, max_wall_length, 0)
         # get_more_paths(get_fence_node_dirs(start_node_idx)[0], get_fence_node_dirs(start_node_idx)[1], 10, 10)
+    for i in range(len(node_colours)):
+        if get_node_colour(i) is not node_colours[i]:
+            print("ERROR in colours")
     idx_1 = random.choice([x for x in parents if x is not None])
     idx_2 = random.choice([x for x in parents if x is not None])
     res = get_first_common_parent(idx_1, idx_2, start_node_idx)
@@ -330,6 +339,7 @@ def dfs_build(start_node_idx):
     print("idx_2 PARENT PATH")
     print_parent_path(idx_2)
     get_maze_path(idx_1, idx_2, start_node_idx)
+
     # reverse_path(idx_1, start_node_idx)
     # print_reversed_path(start_node_idx, idx_1)
     # print("Fence", cfg.fence)
@@ -343,7 +353,7 @@ def dfs_visit(current_node, wall_no, walls_already_built):
         return
 
     possible_dirs_set = {1, 2, 3, 4}
-    neighbours = []
+    explored_neighbours = []
     while possible_dirs_set:
         dir_no = random.sample(possible_dirs_set, 1)  # returned in a form a list
         possible_dirs_set.remove(dir_no[0])
@@ -357,13 +367,19 @@ def dfs_visit(current_node, wall_no, walls_already_built):
                 node_colours[chosen_neighbour] is Colour.White:
             build_vertex(current_node, chosen_neighbour)
             parents[chosen_neighbour] = current_node
-            neighbours.append(chosen_neighbour)
+            explored_neighbours.append(chosen_neighbour)
             dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1)
-            if len(possible_dirs_set) <= 1:
+            # if len(possible_dirs_set) <= 1:
+            # Any not-starting node case
+            if len(explored_neighbours) >= 2 and walls_already_built > 0:
                 node_colours[current_node] = Colour.Black
                 # random_neighbour = random.choice(neighbours)
                 # if random.randint(0, 4) % 3 == 0:
                 #     delete_wall(random_neighbour, current_node)
+                return
+            # Starting node case
+            elif len(explored_neighbours) >= 3 and walls_already_built == 0:
+                node_colours[current_node] = Colour.Black
                 return
 
         # if len(possible_dirs_set) <= 1:
@@ -437,7 +453,9 @@ def get_maze_path(start_node, end_node, start_node_idx):
         print(previous_node, starting_node)
 
         if previous_node and starting_node:
-            delete_wall(previous_node, starting_node)
+            # delete_wall(previous_node, starting_node)
+            cfg.deleted_walls.add((previous_node, starting_node))
+            cfg.deleted_walls.add((starting_node, previous_node))
             print("Wall deleted")
 
     for node in nodes_path:

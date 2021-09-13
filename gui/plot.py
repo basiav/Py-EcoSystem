@@ -188,6 +188,10 @@ class PlotPhotos(Plot):
                     else:
                         colour = (0, 0, 0)
                         lwd = get_lwd()
+                    if (current_fence_node, neighbour_node) in cfg.deleted_walls \
+                            or (neighbour_node, current_fence_node) in cfg.deleted_walls:
+                        colour = colours['white']
+                        lwd = 3
                     pygame.draw.line(self.window, colour, (start_x, start_y), (end_x, end_y), lwd)
 
         self.render_plot(plot_img, canvas, self)
