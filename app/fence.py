@@ -331,6 +331,10 @@ def dfs_build(start_node_idx):
             print("ERROR in colours")
     idx_1 = random.choice([x for x in parents if x is not None])
     idx_2 = random.choice([x for x in parents if x is not None])
+    cfg.start_end_points["start"], cfg.start_end_points["end"] = idx_1, idx_2
+    print("start_end_points", cfg.start_end_points["start"], cfg.start_end_points["end"])
+    print("start_end_points coordinates", get_fence_node_dirs(cfg.start_end_points["start"]),
+          get_fence_node_dirs(cfg.start_end_points["end"]))
     res = get_first_common_parent(idx_1, idx_2, start_node_idx)
     print(res)
     print("start_node_idx", start_node_idx, "idx_1", idx_1, "idx_2", idx_2)
@@ -429,7 +433,8 @@ def get_maze_path(start_node, end_node, start_node_idx):
 
     start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
     next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
-    if next_black_node in cfg.fence[start_next_black_node]:
+    # if next_black_node in cfg.fence[start_next_black_node]:
+    if check_if_wall_exists(next_black_node, start_next_black_node):
         starting_node = next_black_node
         i = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[2]
     else:
@@ -441,6 +446,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
 
     ending_node = get_closest_black_node(end_node)
     print("Ending node", ending_node, node_colours[ending_node])
+    cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
     while i < len(nodes_path):
         previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)

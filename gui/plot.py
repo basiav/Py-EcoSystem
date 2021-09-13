@@ -192,7 +192,21 @@ class PlotPhotos(Plot):
                             or (neighbour_node, current_fence_node) in cfg.deleted_walls:
                         colour = colours['white']
                         lwd = 3
+
                     pygame.draw.line(self.window, colour, (start_x, start_y), (end_x, end_y), lwd)
+
+                    center_x = get_fence_node_dirs(cfg.start_end_points["start"])[0] * self.width_scale
+                    center_y = get_fence_node_dirs(cfg.start_end_points["start"])[1] * self.height_scale
+                    pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // 6)
+                    center_x = get_fence_node_dirs(cfg.start_end_points["end"])[0] * self.width_scale
+                    center_y = get_fence_node_dirs(cfg.start_end_points["end"])[1] * self.height_scale
+                    pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // 6)
+                    center_x = get_fence_node_dirs(cfg.start_end_points["starting_node"])[0] * self.width_scale
+                    center_y = get_fence_node_dirs(cfg.start_end_points["starting_node"])[1] * self.height_scale
+                    pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // 6)
+                    center_x = get_fence_node_dirs(cfg.start_end_points["ending_node"])[0] * self.width_scale
+                    center_y = get_fence_node_dirs(cfg.start_end_points["ending_node"])[1] * self.height_scale
+                    pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // 6)
 
         self.render_plot(plot_img, canvas, self)
 
