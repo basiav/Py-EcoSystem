@@ -22,6 +22,7 @@ start_end_points = {
     "starting_node": None,
     "ending_node": None
 }
+maze_solution = set()
 
 
 def get_aliased_global_variable_names():
@@ -32,7 +33,7 @@ def get_aliased_global_variable_names():
 def set_default_parameters():
     global N, terrain, rabbit_no, wolf_no, rabbit_reproduction_chances, wolf_reproduction_chances, stats, stats_arrs
     global fence, fence_flag, fence_elements
-    global specials, deleted_walls, start_end_points
+    global specials, deleted_walls, start_end_points, maze_solution
     N = 30
     terrain = [[None for _ in range(N)] for _ in range(N)]
 
@@ -57,6 +58,7 @@ def set_default_parameters():
         "starting_node": None,
         "ending_node": None
     }
+    maze_solution = set()
 
 
 def redeclare_fence():

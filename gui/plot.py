@@ -76,7 +76,7 @@ class Plot:
 
 
 class PlotPhotos(Plot):
-    def __init__(self, width, height, agg):
+    def __init__(self, agg):
         window = pygame.display.set_mode(flags=pygame.RESIZABLE)
         super().__init__(window, window.get_width() * 3 // 4, window.get_height())
         self.running = True
@@ -197,7 +197,7 @@ class PlotPhotos(Plot):
 
                     center_x = get_fence_node_dirs(cfg.start_end_points["start"])[0] * self.width_scale
                     center_y = get_fence_node_dirs(cfg.start_end_points["start"])[1] * self.height_scale
-                    pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // 6)
+                    pygame.draw.circle(self.window, colours["pink"], (center_x, center_y), self.width_scale // 6)
                     center_x = get_fence_node_dirs(cfg.start_end_points["end"])[0] * self.width_scale
                     center_y = get_fence_node_dirs(cfg.start_end_points["end"])[1] * self.height_scale
                     pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // 6)
@@ -672,9 +672,8 @@ class MapMenu(Plot):
         cfg.fence_elements = slider_fence.get_scaled_value()
 
     def generate_random_fence(self):
-        # print(config.N)
         reset_fence()
-        dfs_build(451)
+        dfs_build()
 
     def draw_current_mazes(self):
         olive = colours['olive']

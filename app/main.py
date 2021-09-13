@@ -38,12 +38,11 @@ def create_start_menu():
 
 
 def create_sample_fence():
-    # reset_fence()
-    dfs_build(451)
+    dfs_build()
 
 
 def start_simulation():
-    plot = PlotPhotos(700, 700, agg)
+    plot = PlotPhotos(agg)
 
     fig = Figure(figsize=(2, 2), dpi=800)
     canvas = agg.FigureCanvasAgg(fig)
