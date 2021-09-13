@@ -156,7 +156,6 @@ class PlotPhotos(Plot):
         lwd = get_lwd()
 
         for i in range(0, self.tiles):
-            # for i in reversed(range(0, self.tiles)):
             for j in range(0, self.tiles):
                 # Display background
                 pygame.draw.rect(surface, olive, surface.get_rect())
@@ -181,7 +180,6 @@ class PlotPhotos(Plot):
                                        get_fence_node_dirs(current_fence_node)[1] * self.height_scale
                     end_x, end_y = get_fence_node_dirs(neighbour_node)[0] * self.width_scale, \
                                    get_fence_node_dirs(neighbour_node)[1] * self.height_scale
-                    # if (start_x, start_y) != (i, j) and (end_x, end_y) != ():
                     if cfg.specials[neighbour_node] and cfg.specials[current_fence_node]:
                         colour = colours['pink']
                         lwd = 3
@@ -250,7 +248,6 @@ class PlotPhotos(Plot):
 
 class StartMenu(Plot):
     def __init__(self, width, height):
-        # window = pygame.display.set_mode(flags=pygame.RESIZABLE)
         window = pygame.display.set_mode((width, height))
         super().__init__(window, width, height)
         self.start_game = False
@@ -360,7 +357,6 @@ class StartMenu(Plot):
                     print("[START MENU] start_game has just been clicked!")
                     print_settings()
                     self.start_game = True
-                    # self.quit_plot()
                     pygame.quit()
 
                 elif settings_button.collidepoint(mouse_x, mouse_y):
@@ -771,7 +767,6 @@ class MapMenu(Plot):
                 if save_button.collidepoint(mouse_x, mouse_y):
                     print("[MAP SETTINGS MENU] saving map settings and going back to main settings menu...")
                     self.map_ready = True
-                    # self.settings_menu.update()
                     self.settings_menu.do_continue = True
 
                 else:
