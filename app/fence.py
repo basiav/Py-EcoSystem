@@ -1,3 +1,7 @@
+"""
+Contains code for
+"""
+
 import config as cfg
 from common import Directions, random, check_terrain_boundaries, error_exit, Colour
 
@@ -7,21 +11,25 @@ children = [None for _ in range((cfg.N + 1) ** 2)]
 
 
 def paint_fence_white():
+    """DFS-based maintenance."""
     global node_colours
     node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
 
 def get_fence_node_idx(x, y):
+    """Returns the index of the node given by its' x and y coordinates."""
     return x * (cfg.N + 1) + y
 
 
 def get_fence_node_dirs(node_idx):
+    """Returns x and y coordinates of the given node."""
     col = node_idx % (cfg.N + 1)
     row = (node_idx - col) // (cfg.N + 1)
     return row, col
 
 
 def fence_border(node_idx):
+    """Returns directions in which the given node is adjacent to the map's border, if they exist."""
     row, col = get_fence_node_dirs(node_idx)
     borders = []
     if row == 0:
@@ -36,6 +44,8 @@ def fence_border(node_idx):
 
 
 def get_node_neighbour(neighbour_direction, row, column):
+    """Returns a neighbour of the node given by its' coordinates (row and column) and the direction to follow,
+    if exists."""
     try:
         node = get_fence_node_idx(row, column)
         if node < 0 or node > (cfg.N + 1) ** 2:
@@ -58,6 +68,7 @@ def get_node_neighbour(neighbour_direction, row, column):
 
 
 def neighbours_relations(node, neighbour):
+    """Returns direction in which arg node borders with arg neighbour, if exists."""
     if get_node_neighbour(Directions.Up, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
         return Directions.Up
     elif get_node_neighbour(Directions.Right, get_fence_node_dirs(node)[0], get_fence_node_dirs(node)[1]) == neighbour:
@@ -69,6 +80,7 @@ def neighbours_relations(node, neighbour):
 
 
 def get_surrounding_nodes(direction, x_coord, y_coord):
+    """Returns all the nodes that border node given by args: x_coord, y_coord, provided that those nodes exist."""
     if direction == Directions.Up:
         upper_left_node_idx = get_fence_node_idx(x_coord, y_coord)
         upper_right_node_idx = get_fence_node_idx(x_coord, y_coord + 1)
@@ -91,6 +103,7 @@ def get_surrounding_nodes(direction, x_coord, y_coord):
 
 
 def get_move_direction(delta_x, delta_y):
+    """Returns a movement direction given by the x and y vectors."""
     if delta_x == 0 and delta_y == 1:
         return Directions.Up
     elif delta_x == 1 and delta_y == 1:
@@ -110,6 +123,13 @@ def get_move_direction(delta_x, delta_y):
 
 
 def can_make_move(current_row, current_column, delta_x, delta_y):
+    """Decides whether an animal can make a certain move or not, considering fence placement and map boundaries.
+    :param current_row: current x position of an animal
+    :param current_column: current y position of an animal
+    :param delta_x: x coordinate of animal's movement vector
+    :param delta_y: y coordinate of animal's movement vector
+    :return: boolean
+    """
     if not check_terrain_boundaries(current_row - delta_y, current_column + delta_x):  # Column-Row/X_coord-Y_coord
         # modification
         return False
@@ -197,18 +217,26 @@ def can_make_move(current_row, current_column, delta_x, delta_y):
 
 
 def add_vertex(node_idx_1, node_idx_2):
+    """Adds node_idx_2 to node_idx_1's fence-graph neighbours"""
     cfg.fence[node_idx_1].append(node_idx_2)
 
 
 def delete_vertex(node_idx_1, node_idx_2):
+    """Deletes node_idx_2 from node_idx_1's fence-graph neighbours"""
     cfg.fence[node_idx_1].remove(node_idx_2)
 
 
 def check_if_wall_exists(node_idx_1, node_idx_2):
+    """Checks whether a vertex exists between given two nodes."""
     return node_idx_2 in cfg.fence[node_idx_1] or node_idx_1 in cfg.fence[node_idx_2]
 
 
 def build_vertex(start_node, end_node):
+    """Builds a fence wall, first checking whether: - given nodes are placed in proper proximity (they have to be
+    direct neighbours for the vertex to exist), - there's no redundancy (end_node will be placed in start_node's
+    neighbourhood set and start_node will not be placed in end_node's neighbourhood set, particular node will be
+    added to the neighbourhood set just once)
+    """
     allowed_proximity_directions = [Directions.Up, Directions.Right, Directions.Down, Directions.Left]
     if neighbours_relations(start_node, end_node) not in allowed_proximity_directions and \
             neighbours_relations(end_node, start_node) not in allowed_proximity_directions:
@@ -220,6 +248,7 @@ def build_vertex(start_node, end_node):
 
 
 def delete_wall(start_node, end_node):
+    """Deletes vertex between the two given nodes, checks whether they are direct neighbours and the vertex exists."""
     allowed_proximity_directions = [Directions.Up, Directions.Right, Directions.Down, Directions.Left]
     if neighbours_relations(start_node, end_node) not in allowed_proximity_directions and \
             neighbours_relations(end_node, start_node) not in allowed_proximity_directions:
@@ -231,21 +260,25 @@ def delete_wall(start_node, end_node):
 
 
 def delete_all_walls():
+    """Fence clean-up."""
     for i in range(0, ((cfg.N + 1) ** 2) - 1):
         cfg.fence[i] = list()
 
 
 def reset_fence():
+    """Fence clean-up."""
     delete_all_walls()
     paint_fence_white()
 
 
 def reset_node_colours():
+    """Fence clean-up."""
     global node_colours
     node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
 
 def reset_parents_and_children():
+    """Fence clean-up."""
     global parents, children
     parents = [None for _ in range((cfg.N + 1) ** 2)]
     children = [None for _ in range((cfg.N + 1) ** 2)]
@@ -253,6 +286,7 @@ def reset_parents_and_children():
 
 
 def get_random_corner_fence_location(randint_1, randint_2):
+    """Returns a randomised fence-generating starting (x, y) position."""
     start_row = random.randint(int(0.1 * cfg.N), int(0.5 * cfg.N)) if randint_1 % 2 == 0 \
         else random.randint(int(0.5 * cfg.N), int(0.9 * cfg.N))
     start_col = random.randint(int(0.1 * cfg.N), int(0.5 * cfg.N)) if randint_2 % 2 == 0 \
@@ -261,6 +295,7 @@ def get_random_corner_fence_location(randint_1, randint_2):
 
 
 def get_node_colour(node_idx):
+    """Test for DFS-based function."""
     walls_no = 0
     for dir in Directions:
         x, y = get_fence_node_dirs(node_idx)
@@ -427,6 +462,9 @@ def get_maze_path(start_node, end_node, start_node_idx):
 
 
 def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, length):
+    """Returns an array of nodes on a joined path.
+    :param node_with_shorter_path: 
+    """
     joined_path = [_ for _ in range(0, length - 1)]
     i = 0
 
