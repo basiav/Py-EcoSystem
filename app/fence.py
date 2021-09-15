@@ -450,16 +450,15 @@ def get_maze_path(start_node, end_node, start_node_idx):
     styk 3 ścian, co oznacza, że wyznacza on 2 lub 3 sąsiadujące ze sobą łamane otwarte (korytarze): 3, jeśli
     w bezpośrednim sąsiedztwie tego wierzchołka znajduje się inny czarny wierchołek; 2 w przeciwnym wypadku. Interesować
     nas będzie ciąg czarnych wierchołków obecnych na otrzymanej w pkt. 1. ścieżce. Każde 2 sąsiednie czarne wierchołki
-    w tym ciągu, które jednocześnie nie sąsiadują ze sobą na ścieżce, wyznaczają korytarz, którym da się przejść (wzdłuż,
-    zawartych pomiędzy, wierzchołków szarych). Natomiast każde 3 sąsiednie czarne wierzchołki w tym ciągu wyznaczają
-    'ślepy zaułek' (pewien zamknięty fragment korytarza, który graniczy z sąsiadującym korytarzem). W ciągu czarnych
-    wierzchołków na ścieżce z pkt. 1. będziemy więc rozpatrywać podciągi trójek najbliższych sobie czarnych wierzchołków,
-    gdzie ostatni czarny wierchołek n-tego podciągu jest pierwszym wierzchołkiem n+1-szego podciągu. W każdym z tych
-    podciągów wybieramy ostatni, trzeci wierzchołek i usuwamy na ścieżce krawedź łączącą go z sąsiadującym z nim na
-    ścieżce poprzednikiem (dowolnego koloru). W ten sposób tworzymy przejścia pomiędzy sąsiednimi 'ślepymi zaułkami'
-    i gwarantujemy 'rozwiązanie' labiryntu pomiędzy dwoma zadanymi punktami, przekształcając zbiór łamanych otwartych
-    ('pseudolabirynt') w labirynt.
-    """
+    w tym ciągu, które jednocześnie nie sąsiadują ze sobą na ścieżce, wyznaczają korytarz, którym da się przejść
+    (wzdłuż, zawartych pomiędzy, wierzchołków szarych). Natomiast każde 3 sąsiednie czarne wierzchołki w tym ciągu
+    wyznaczają 'ślepy zaułek' (pewien zamknięty fragment korytarza, który graniczy z sąsiadującym korytarzem). W ciągu
+    czarnych wierzchołków na ścieżce z pkt. 1. będziemy więc rozpatrywać podciągi trójek najbliższych sobie czarnych
+    wierzchołków, gdzie ostatni czarny wierchołek n-tego podciągu jest pierwszym wierzchołkiem n+1-szego podciągu.
+    W każdym z tych podciągów wybieramy ostatni, trzeci wierzchołek i usuwamy na ścieżce krawedzie łączące go
+    z sąsiadującymi z nim na ścieżce poprzednikiem oraz następnikiem (dowolnego koloru). W ten sposób tworzymy przejścia
+    pomiędzy sąsiednimi 'ślepymi zaułkami' i gwarantujemy 'rozwiązanie' labiryntu pomiędzy dwoma zadanymi punktami,
+    przekształcając zbiór łamanych otwartych ('pseudolabirynt') w labirynt."""
     first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
     # Zgodność z założeniami
     if not first_common_parent:
@@ -512,21 +511,27 @@ def get_maze_path(start_node, end_node, start_node_idx):
             cfg.deleted_walls.add((previous_node, starting_node))
             cfg.deleted_walls.add((starting_node, previous_node))
             # Delete the wall between starting node and the following node
-            if i < len(nodes_path):
-                following_node = nodes_path[i]
+            if i + 1 < len(nodes_path):
+                following_node = nodes_path[i + 1]
+                delete_wall(starting_node, following_node)
                 cfg.deleted_walls.add((following_node, starting_node))
                 cfg.deleted_walls.add((starting_node, following_node))
-            print("Walls deleted")
+
+        if i >= len(nodes_path) - 1:
+            break
 
         # previous_node, starting_node, i = get_next_black_node(nodes_path[starting_node], starting_node, nodes_path, i + 1)
         previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
         print(previous_node, starting_node)
 
         if (previous_node and starting_node) and (previous_node != starting_node):
-            # delete_wall(previous_node, starting_node)
+            delete_wall(previous_node, starting_node)
             cfg.deleted_walls.add((previous_node, starting_node))
-            cfg.deleted_walls.add((starting_node, previous_node))
-            print("Wall deleted")
+            if i + 1 < len(nodes_path):
+                following_node = nodes_path[i + 1]
+                delete_wall(starting_node, following_node)
+                cfg.deleted_walls.add((starting_node, following_node))
+                cfg.deleted_walls.add((following_node, previous_node))
         # print("previous_node, starting_node", previous_node, starting_node)
 
     for node in nodes_path:
