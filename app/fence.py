@@ -378,7 +378,7 @@ def dfs_visit(current_node, wall_no, walls_already_built):
     w jednej serii wywołań rekurencyjnych. Losujemy kierunek, w którym postawimy ścianę (góra/prawo/dół/lewo).
     Sprawdzamy warunki postawienia ściany w tym kierunku - standardowe warunki DFS z jedną modyfikacją:
     za wierzchołek czarny (przetworzony) uznajemy taki, z którego wychodzą 3 ściany. Gwarantuje to otwarty charakter
-    łamanych. Zatem wierzchołki, z których wychodzą 1 lub 2 ściany są szare, wierchołki, z których wychodzą 3 ściany
+    łamanych. Zatem wierzchołki, z których wychodzą 1 lub 2 ściany są szare, wierzchołki, z których wychodzą 3 ściany
     są czarne, a wierzchołki poza labiryntem są białe.
 
     W wyniku działania tej procedury powstaje zbiór korytarzy labiryntu, bardziej lub mniej 'rozgałęzionych'.
@@ -420,9 +420,46 @@ def dfs_visit(current_node, wall_no, walls_already_built):
 
 
 def get_maze_path(start_node, end_node, start_node_idx):
+    """Wyznacza 'rozwiązanie' labiryntu, tj. przejście pomiędzy zadanymi punktami (wierzchołkami).
+
+    :param start_node: Start of the labirynth path.
+    :param end_node: End of the labirynth path.
+    :param start_node_idx: DFS source for technical purposes.
+
+    Założenia:
+    Oba punkty są wierzchołkami tego samego drzewa przeszukiwania wgłąb, choć mogą (a nawet powinny, dla efektów
+    wizualnych) leżeć na różnych jego gałęziach (po różnych 'stronach' wierzchołka-źródła DFS).
+
+    Działanie:
+    Korzystając z gotowego już drzewa przeszukiwania wgłąb (parents[]), wyznaczać będziemy ścieżkę pomiędzy zadanymi
+    wierchołkami.
+
+    1. Rozpatrujemy ścieżki od danych wierzchołków do wierzchołka-źródła DFS i znajdujemy pierwszy (idąc od liści)
+    wierzchołek wspólny dla obu tych ścieżek. Wierzchołek ten wyznacza ścieżkę pomiędzy zadanymi wierzchołkami - należy
+    wziąć ścieżkę od jednego zadanego wierzchołka do wierzchołka wspólnego i połączyć ją ze ścieżką od drugiego zadanego
+    wierzchołka do wierchołka wspólnego, ale 'odwróconą' (zmiana kierunku krawędzi na przeciwny). Odwracamy krótszą
+    z ww. ścieżek, następnie ścieżki 'łączymy'. W otrzymanej końcowej ścieżce wierzchołkiem początkowym jest ten,
+    który jest bardziej oddalony od punktu wspólnego, a końcowym ten, który znajduje się bliżej punktu wspólnego.
+
+    2. W wygenerowanym w procedurze dfs_visit zbiorze ścian kluczowe są wierchołki czarne. Każdy wierchołek czarny to
+    styk 3 ścian, co oznacza, że wyznacza on 2 lub 3 sąsiadujące ze sobą łamane otwarte (korytarze): 3, jeśli
+    w bezpośrednim sąsiedztwie tego wierzchołka znajduje się inny czarny wierchołek; 2 w przeciwnym wypadku. Interesować
+    nas będzie ciąg czarnych wierchołków obecnych na otrzymanej w pkt. 1. ścieżce. Każde 2 sąsiednie czarne wierchołki
+    w tym ciągu, które jednocześnie nie sąsiadują ze sobą na ścieżce, wyznaczają korytarz, którym da się przejść (wzdłuż,
+    zawartych pomiędzy, wierzchołków szarych). Natomiast każde 3 sąsiednie czarne wierzchołki w tym ciągu wyznaczają
+    'ślepy zaułek' (pewien zamknięty fragment korytarza, który graniczy z sąsiadującym korytarzem). W ciągu czarnych
+    wierzchołków na ścieżce z pkt. 1. będziemy więc rozpatrywać podciągi trójek najbliższych sobie czarnych wierzchołków,
+    gdzie ostatni czarny wierchołek n-tego podciągu jest pierwszym wierzchołkiem n+1-szego podciągu. W każdym z tych
+    podciągów wybieramy ostatni, trzeci wierzchołek i usuwamy na ścieżce krawedź łączącą go z sąsiadującym z nim na
+    ścieżce poprzednikiem (dowolnego koloru). W ten sposób tworzymy przejścia pomiędzy sąsiednimi 'ślepymi zaułkami'
+    i gwarantujemy 'rozwiązanie' labiryntu pomiędzy dwoma zadanymi punktami, przekształcając zbiór łamanych otwartych
+    ('pseudolabirynt') w labirynt.
+    """
     first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
+    # Zgodność z założeniami
     if not first_common_parent:
         return
+
     node_with_shorter_path = first_common_parent["node_with_shorter_path"]
     node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
     first_common_node_idx = first_common_parent["first_common_idx"]
