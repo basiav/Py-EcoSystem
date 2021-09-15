@@ -6,6 +6,7 @@ from common import Directions, random, check_terrain_boundaries, error_exit, Col
 node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 parents = [None for _ in range((cfg.N + 1) ** 2)]
 children = [None for _ in range((cfg.N + 1) ** 2)]
+maze_elements_sets = [set() for _ in range(cfg.fence_elements)]
 
 
 def paint_fence_white():
@@ -318,11 +319,13 @@ def dfs_build():
     3. Wywołuje n razy procedurę dfs_visit, tworząc ściany n 'wysp' labiryntu.
     4.
     """
+    global maze_elements_sets
     reset_node_colours()
     reset_parents_and_children()
     start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
     start_node_idx = get_fence_node_idx(start_row, start_col)
     parents[start_node_idx] = start_node_idx
+    maze_elements_sets = [set() for _ in range(cfg.fence_elements)]
 
     # 1.
     if cfg.fence_elements <= 1:
@@ -343,13 +346,18 @@ def dfs_build():
             i -= 1
             continue
         # 3.
-        dfs_visit(start_node_idx, max_wall_length, 0)
+        dfs_visit(start_node_idx, max_wall_length, 0, i)
 
-    for i in range(len(node_colours)):
-        if get_node_colour(i) is not node_colours[i]:
-            print("ERROR in colours")
-    idx_1 = random.choice([x for x in parents if x is not None])
-    idx_2 = random.choice([x for x in parents if x is not None])
+        
+
+    # for i in range(len(node_colours)):
+    #     if get_node_colour(i) is not node_colours[i]:
+    #         print("ERROR in colours")
+
+    print(maze_elements_sets)
+
+    idx_1 = random.choice([x for x in parents if x is not None and x in maze_elements_sets[0]])
+    idx_2 = random.choice([x for x in parents if x is not None and x in maze_elements_sets[0]])
     cfg.start_end_points["start"], cfg.start_end_points["end"] = idx_1, idx_2
     print("start_end_points", cfg.start_end_points["start"], cfg.start_end_points["end"])
     print("start_end_points coordinates", get_fence_node_dirs(cfg.start_end_points["start"]),
@@ -368,7 +376,7 @@ def dfs_build():
     # print("Fence", cfg.fence)
 
 
-def dfs_visit(current_node, wall_no, walls_already_built):
+def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
     """Buduje jedną pełną 'wyspę' (element) labiryntu. Generowane są zbiory łamanych otwartych, których boki mogą być
     względem siebie jedynie prostopadłe lub równoległe (wybór losowy). Zbiór łamanych reprezentuje ściany labiryntu,
     przestrzenie wewnątrz łamanych reprezentują korytarze labiryntu.
@@ -385,8 +393,9 @@ def dfs_visit(current_node, wall_no, walls_already_built):
     Są to jednak łamane otwarte, zatem do każdej z nich da się wejść z zewnątrz (spoza labiryntu), ale nie istnieją
     przejścia pomiędzy nimi (inne niż wyjście z korytarzy w obrębie danej łamanej poza labirynt i wejście do
     sąsiadującej łamanej). Przejścia pomiędzy łamanymi tworzone są w procedurze get_maze_path."""
-    global node_colours, parents
+    global node_colours, parents, maze_elements_sets
     node_colours[current_node] = Colour.Grey
+    maze_elements_sets[maze_element_id].add(current_node)
 
     if walls_already_built >= wall_no:
         return
@@ -406,7 +415,7 @@ def dfs_visit(current_node, wall_no, walls_already_built):
             build_vertex(current_node, chosen_neighbour)
             parents[chosen_neighbour] = current_node
             explored_neighbours.append(chosen_neighbour)
-            dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1)
+            dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1, maze_element_id)
             # if len(possible_dirs_set) <= 1:
 
             # Any not-starting node case
