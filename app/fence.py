@@ -282,6 +282,13 @@ def reset_parents_and_children():
     parents = [None for _ in range((cfg.N + 1) ** 2)]
     children = [None for _ in range((cfg.N + 1) ** 2)]
     cfg.specials = [False for _ in range((cfg.N + 1) ** 2)]
+    cfg.deleted_walls = set()
+    cfg.start_end_points = {
+        "start": None,
+        "end": None,
+        "starting_node": None,
+        "ending_node": None
+    }
 
 
 def get_random_corner_fence_location(randint_1, randint_2):
@@ -315,9 +322,10 @@ def dfs_build():
     """Generuje n elementów labiryntu (płotu):
     1. Wyznacza maksymalną głębokość przeszukiwania w DFS (maksymalna liczba postawionych ścian płotu w jednym cyklu
     wywołań rekurencyjnych DFS) - na podstawie wielkości mapy terenu (N).
-    2. Wyznacza losowe początki n poszczególnych elementów ('wysp') labiryntu, czyli źródła DFS.
+    2. Wyznacza losowe początki n poszczególnych elementów ('wysp') labiryntu, czyli źródła n pierwotnych wywołań DFS.
     3. Wywołuje n razy procedurę dfs_visit, tworząc ściany n 'wysp' labiryntu.
-    4.
+    4. Wyznacza po 2 losowe punkty w obrębie każdej 'wyspy' (każdego drzewa przeszukiwania wgłąb), pomiędzy którymi
+    tworzone będzie 'rozwiązanie' labiryntu (patrz procedura get_maze_path).
     """
     global maze_elements_sets
     reset_node_colours()
@@ -348,32 +356,22 @@ def dfs_build():
         # 3.
         dfs_visit(start_node_idx, max_wall_length, 0, i)
 
-        
+        possible_tries = 5
+        # Try 5 times in case the drawn nodes are not from the same DFS tree, which should not be the case, but safety
+        for _ in range(possible_tries):
+            idx_1 = random.choice([x for x in maze_elements_sets[i]])
+            idx_2 = random.choice([x for x in maze_elements_sets[i]])
+            cfg.start_end_points["start"], cfg.start_end_points["end"] = idx_1, idx_2
+            res = get_first_common_parent(idx_1, idx_2, start_node_idx)
+            if not res:
+                continue
+            else:
+                get_maze_path(idx_1, idx_2, start_node_idx)
+                break
 
     # for i in range(len(node_colours)):
     #     if get_node_colour(i) is not node_colours[i]:
     #         print("ERROR in colours")
-
-    print(maze_elements_sets)
-
-    idx_1 = random.choice([x for x in parents if x is not None and x in maze_elements_sets[0]])
-    idx_2 = random.choice([x for x in parents if x is not None and x in maze_elements_sets[0]])
-    cfg.start_end_points["start"], cfg.start_end_points["end"] = idx_1, idx_2
-    print("start_end_points", cfg.start_end_points["start"], cfg.start_end_points["end"])
-    print("start_end_points coordinates", get_fence_node_dirs(cfg.start_end_points["start"]),
-          get_fence_node_dirs(cfg.start_end_points["end"]))
-    res = get_first_common_parent(idx_1, idx_2, start_node_idx)
-    print(res)
-    print("start_node_idx", start_node_idx, "idx_1", idx_1, "idx_2", idx_2)
-    print("idx_1 PARENT PATH")
-    print_parent_path(idx_1)
-    print("idx_2 PARENT PATH")
-    print_parent_path(idx_2)
-    get_maze_path(idx_1, idx_2, start_node_idx)
-
-    # reverse_path(idx_1, start_node_idx)
-    # print_reversed_path(start_node_idx, idx_1)
-    # print("Fence", cfg.fence)
 
 
 def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
@@ -416,7 +414,6 @@ def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
             parents[chosen_neighbour] = current_node
             explored_neighbours.append(chosen_neighbour)
             dfs_visit(chosen_neighbour, wall_no, walls_already_built + 1, maze_element_id)
-            # if len(possible_dirs_set) <= 1:
 
             # Any not-starting node case
             if len(explored_neighbours) >= 2 and walls_already_built > 0:
@@ -472,7 +469,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
     node_with_shorter_path = first_common_parent["node_with_shorter_path"]
     node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
     first_common_node_idx = first_common_parent["first_common_idx"]
-    print("first_common_node_idx", first_common_node_idx)
+    # print("first_common_node_idx", first_common_node_idx)
     shorter_path_length = first_common_parent["path_length"]
     longer_path_length = get_parent_path_length(node_with_longer_path, first_common_node_idx)
     total_length = shorter_path_length + longer_path_length
@@ -482,7 +479,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
 
     nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
                                        total_length)
-    print("Nodes path", nodes_path)
+    # print("Nodes path", nodes_path)
 
     start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
     next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
@@ -495,10 +492,10 @@ def get_maze_path(start_node, end_node, start_node_idx):
         i = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[2]
     if node_colours[starting_node] is not Colour.Black:
         error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
-    print("Starting node", starting_node, node_colours[starting_node])
+    # print("Starting node", starting_node, node_colours[starting_node])
 
     ending_node = get_closest_black_node(end_node)
-    print("Ending node", ending_node, node_colours[ending_node])
+    # print("Ending node", ending_node, node_colours[ending_node])
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
     while i < len(nodes_path):
@@ -528,7 +525,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
             cfg.deleted_walls.add((previous_node, starting_node))
             cfg.deleted_walls.add((starting_node, previous_node))
             print("Wall deleted")
-        print("previous_node, starting_node", previous_node, starting_node)
+        # print("previous_node, starting_node", previous_node, starting_node)
 
     for node in nodes_path:
         cfg.specials[node] = True
@@ -654,8 +651,8 @@ def reverse_path(node_beginning, node_end):
     global parents, children
     if node_beginning == node_end:
         # children[node_beginning] = node_beginning
-        print("End point | CHILD of ", node_beginning, "is", children[node_beginning])
+        # print("End point | CHILD of ", node_beginning, "is", children[node_beginning])
         return
     children[parents[node_beginning]] = node_beginning
-    print("CHILD of ", node_beginning, "is", children[node_beginning])
+    # print("CHILD of ", node_beginning, "is", children[node_beginning])
     reverse_path(parents[node_beginning], node_end)
