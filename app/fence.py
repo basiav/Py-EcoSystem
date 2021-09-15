@@ -361,7 +361,6 @@ def dfs_build():
         for _ in range(possible_tries):
             idx_1 = random.choice([x for x in maze_elements_sets[i]])
             idx_2 = random.choice([x for x in maze_elements_sets[i]])
-            cfg.start_end_points["start"], cfg.start_end_points["end"] = idx_1, idx_2
             res = get_first_common_parent(idx_1, idx_2, start_node_idx)
             if not res:
                 continue
@@ -471,6 +470,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
     first_common_node_idx = first_common_parent["first_common_idx"]
     # print("first_common_node_idx", first_common_node_idx)
     shorter_path_length = first_common_parent["path_length"]
+    cfg.start_end_points["start"], cfg.start_end_points["end"] = node_with_longer_path, node_with_shorter_path
     longer_path_length = get_parent_path_length(node_with_longer_path, first_common_node_idx)
     total_length = shorter_path_length + longer_path_length
 
@@ -498,8 +498,9 @@ def get_maze_path(start_node, end_node, start_node_idx):
     # print("Ending node", ending_node, node_colours[ending_node])
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
-    while i < len(nodes_path):
-        previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
+    while i < len(nodes_path) - 1:
+        # previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
+        previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
         print(previous_node, starting_node)
 
         # if previous_node == starting_node:
@@ -517,7 +518,8 @@ def get_maze_path(start_node, end_node, start_node_idx):
                 cfg.deleted_walls.add((starting_node, following_node))
             print("Walls deleted")
 
-        previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
+        # previous_node, starting_node, i = get_next_black_node(nodes_path[starting_node], starting_node, nodes_path, i + 1)
+        previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
         print(previous_node, starting_node)
 
         if (previous_node and starting_node) and (previous_node != starting_node):
