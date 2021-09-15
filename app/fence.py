@@ -1,6 +1,4 @@
-"""
-Contains code for
-"""
+"""Fence (maze) generation engine and animal movement limitations due to fence placement."""
 
 import config as cfg
 from common import Directions, random, check_terrain_boundaries, error_exit, Colour
@@ -11,7 +9,7 @@ children = [None for _ in range((cfg.N + 1) ** 2)]
 
 
 def paint_fence_white():
-    """DFS-based maintenance."""
+    """DFS tree maintenance."""
     global node_colours
     node_colours = [Colour.White for _ in range((cfg.N + 1) ** 2)]
 
@@ -313,17 +311,28 @@ def get_node_colour(node_idx):
 
 
 def dfs_build():
+    """Generuje n elementów labiryntu (płotu):
+    1. Wyznacza maksymalną głębokość przeszukiwania w DFS (maksymalna liczba postawionych ścian płotu w jednym cyklu
+    wywołań rekurencyjnych DFS) - na podstawie wielkości mapy terenu (N).
+    2. Wyznacza losowe początki n poszczególnych elementów ('wysp') labiryntu, czyli źródła DFS.
+    3. Wywołuje n razy procedurę dfs_visit, tworząc ściany n 'wysp' labiryntu.
+    4.
+    """
     reset_node_colours()
     reset_parents_and_children()
     start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
     start_node_idx = get_fence_node_idx(start_row, start_col)
     parents[start_node_idx] = start_node_idx
+
+    # 1.
     if cfg.fence_elements <= 1:
         max_wall_length = int(cfg.N)
     elif cfg.fence_elements <= 3:
         max_wall_length = int(cfg.N * 3 / 4)
     else:
         max_wall_length = int(cfg.N * 2 / 3)
+
+    # 2.
     for i in range(0, cfg.fence_elements):
         if i >= 1:
             start_row, start_col = get_random_corner_fence_location(random.randint(0, 1), random.randint(0, 1))
@@ -333,7 +342,9 @@ def dfs_build():
                   "Repeat the procedure.")
             i -= 1
             continue
+        # 3.
         dfs_visit(start_node_idx, max_wall_length, 0)
+
     for i in range(len(node_colours)):
         if get_node_colour(i) is not node_colours[i]:
             print("ERROR in colours")
@@ -358,6 +369,22 @@ def dfs_build():
 
 
 def dfs_visit(current_node, wall_no, walls_already_built):
+    """Buduje jedną pełną 'wyspę' (element) labiryntu. Generowane są zbiory łamanych otwartych, których boki mogą być
+    względem siebie jedynie prostopadłe lub równoległe (wybór losowy). Zbiór łamanych reprezentuje ściany labiryntu,
+    przestrzenie wewnątrz łamanych reprezentują korytarze labiryntu.
+
+    Działanie:
+    Kolorujemy odwiedzany wierzchołek na szaro. Sprawdzamy, czy nie przekroczyliśmy limitu ścian stawianych
+    w jednej serii wywołań rekurencyjnych. Losujemy kierunek, w którym postawimy ścianę (góra/prawo/dół/lewo).
+    Sprawdzamy warunki postawienia ściany w tym kierunku - standardowe warunki DFS z jedną modyfikacją:
+    za wierzchołek czarny (przetworzony) uznajemy taki, z którego wychodzą 3 ściany. Gwarantuje to otwarty charakter
+    łamanych. Zatem wierzchołki, z których wychodzą 1 lub 2 ściany są szare, wierchołki, z których wychodzą 3 ściany
+    są czarne, a wierzchołki poza labiryntem są białe.
+
+    W wyniku działania tej procedury powstaje zbiór korytarzy labiryntu, bardziej lub mniej 'rozgałęzionych'.
+    Są to jednak łamane otwarte, zatem do każdej z nich da się wejść z zewnątrz (spoza labiryntu), ale nie istnieją
+    przejścia pomiędzy nimi (inne niż wyjście z korytarzy w obrębie danej łamanej poza labirynt i wejście do
+    sąsiadującej łamanej). Przejścia pomiędzy łamanymi tworzone są w procedurze get_maze_path."""
     global node_colours, parents
     node_colours[current_node] = Colour.Grey
 
@@ -462,8 +489,18 @@ def get_maze_path(start_node, end_node, start_node_idx):
 
 
 def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path, length):
-    """Returns an array of nodes on a joined path.
-    :param node_with_shorter_path: 
+    """Returns a path between any two given points within the same DFS tree (the same maze 'element'). Merges two paths:
+    - the longer one (non-reversed), starting in node_with_longer_path and passing through its' following
+    DFS-parent nodes (parents[]),
+    - the shorter one (reversed), starting in node_with_shorter_path, which is a reverse of the DFS-parent-nodes
+    path (children[]).
+    Returns a concatenation of these two paths, hence a path between: node_with_longer_path and node_with_shorter_path.
+    :param node_with_shorter_path: Beginning node of the path to reverse.
+    :param first_common_node_idx: The first node that is mutual for both paths. It can be any node, including the DFS
+    source node.
+    :param node_with_longer_path: Beginning node of the the non-reversed path.
+    :param length: The length of the path to be created.
+    :return: An array in which the i-th element represents the i-th node on the path.
     """
     joined_path = [_ for _ in range(0, length - 1)]
     i = 0
@@ -484,6 +521,13 @@ def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_wi
 
 
 def get_next_black_node(current_node, previous_node, nodes_path, i):
+    """Returns a pair of the next black (DFS tree colouring) and its' predecessor on a given node path.
+    :param current_node: The current node. We're searching for its' next black neighbour on the given path.
+    :param previous_node: Predecessor of the current node. Needed for the purposes of the get_maze_path function.
+    :param nodes_path: The graph path to follow.
+    :param i: Position on the graph path to follow.
+    :return: Pair of (predecessor, next black node).
+    """
     global node_colours
     if current_node < 0 or current_node > (cfg.N + 1) ** 2 \
             or node_colours[current_node] is Colour.White or i >= len(nodes_path) - 1:
@@ -494,6 +538,7 @@ def get_next_black_node(current_node, previous_node, nodes_path, i):
         return get_next_black_node(nodes_path[i + 1], current_node, nodes_path, i + 1)
 
 
+# Auxiliary function
 def get_closest_black_node(node_idx):
     while node_colours[node_idx] is not Colour.White and node_idx != parents[node_idx]:
         if node_colours[node_idx] is Colour.Black:
@@ -501,6 +546,7 @@ def get_closest_black_node(node_idx):
         node_idx = parents[node_idx]
 
 
+# Auxiliary function
 def get_parent_path_length(child_node, parent_node):
     length = 1
     while child_node != parent_node:
@@ -510,6 +556,14 @@ def get_parent_path_length(child_node, parent_node):
 
 
 def get_first_common_parent(node_idx_1, node_idx_2, start_node_idx):
+    """Takes two nodes and processes their DFS tree paths (parents[]). Searches for the first node that is mutual
+    for those two paths (any node, including the DFS source, if the two nodes are on different DFS tree branches).
+    :param node_idx_1: First node.
+    :param node_idx_2: Second node.
+    :param start_node_idx: DFS source node. Along with the 'parents' array, it constitutes the DFS tree.
+    :return: A dictionary of {node with a shorter 'DFS parent' path to the DFS source; first mutual node;
+    length of the shorter 'DFS parent' path}
+    """
     global parents
     node_idx_1_parent_path = set()
     i = node_idx_1
@@ -533,6 +587,7 @@ def get_first_common_parent(node_idx_1, node_idx_2, start_node_idx):
     return False
 
 
+# For test purposes only
 def print_parent_path(node_idx):
     print(node_idx)
     if node_idx == parents[node_idx]:
@@ -540,6 +595,7 @@ def print_parent_path(node_idx):
     print_parent_path(parents[node_idx])
 
 
+# For test purposes only
 def print_reversed_path(node_from, node_to):
     print("Reversed path", node_from)
     if children[node_from] is None or node_from == node_to:
@@ -548,6 +604,7 @@ def print_reversed_path(node_from, node_to):
 
 
 def reverse_path(node_beginning, node_end):
+    """Takes two nodes on one DFS tree branch, processes the DFS tree path between them and reverses this path."""
     global parents, children
     if node_beginning == node_end:
         # children[node_beginning] = node_beginning
