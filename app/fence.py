@@ -325,12 +325,11 @@ def dfs_build():
     2. Wyznacza losowe początki n poszczególnych elementów ('wysp') labiryntu, czyli źródła n pierwotnych wywołań DFS.
     3. Wywołuje n razy procedurę dfs_visit, tworząc ściany n 'wysp' labiryntu.
     4. Wyznacza po 2 losowe punkty w obrębie każdej 'wyspy' (każdego drzewa przeszukiwania wgłąb), pomiędzy którymi
-    tworzone będzie 'rozwiązanie' labiryntu (patrz procedura get_maze_path).
-    """
+    tworzone będzie 'rozwiązanie' labiryntu (patrz procedura get_maze_path)."""
     global maze_elements_sets
     reset_node_colours()
     reset_parents_and_children()
-    start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)
+    start_row, start_col = int(1 / 2 * cfg.N), int(1 / 2 * cfg.N)  # 2.
     start_node_idx = get_fence_node_idx(start_row, start_col)
     parents[start_node_idx] = start_node_idx
     maze_elements_sets = [set() for _ in range(cfg.fence_elements)]
@@ -343,9 +342,9 @@ def dfs_build():
     else:
         max_wall_length = int(cfg.N * 2 / 3)
 
-    # 2.
     for i in range(0, cfg.fence_elements):
         if i >= 1:
+            # 2.
             start_row, start_col = get_random_corner_fence_location(random.randint(0, 1), random.randint(0, 1))
             start_node_idx = get_fence_node_idx(start_row, start_col)
         if bool(fence_border(start_node_idx)):
@@ -356,6 +355,7 @@ def dfs_build():
         # 3.
         dfs_visit(start_node_idx, max_wall_length, 0, i)
 
+        # 4.
         possible_tries = 5
         # Try 5 times in case the drawn nodes are not from the same DFS tree, which should not be the case, but safety
         for _ in range(possible_tries):
@@ -583,7 +583,8 @@ def get_next_black_node(current_node, previous_node, nodes_path, i):
 
 # Auxiliary function
 def get_closest_black_node(node_idx):
-    while node_colours[node_idx] is not Colour.White and node_idx != parents[node_idx]:
+    while node_colours[node_idx] is not Colour.White and node_idx != parents[node_idx] \
+            and parents[node_idx] is not None:
         if node_colours[node_idx] is Colour.Black:
             return node_idx
         node_idx = parents[node_idx]

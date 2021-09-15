@@ -70,6 +70,21 @@ class Plot:
         pygame.draw.rect(surface, colours['olive'], surface.get_rect())
         self.window.blit(surface, (0, 0))
 
+    def draw_maze_path_points(self):
+        div = 4 if cfg.N >= 40 else 6
+        center_x = get_fence_node_dirs(cfg.start_end_points["start"])[0] * self.width_scale
+        center_y = get_fence_node_dirs(cfg.start_end_points["start"])[1] * self.height_scale
+        pygame.draw.circle(self.window, colours["pink"], (center_x, center_y), self.width_scale // div)
+        center_x = get_fence_node_dirs(cfg.start_end_points["end"])[0] * self.width_scale
+        center_y = get_fence_node_dirs(cfg.start_end_points["end"])[1] * self.height_scale
+        pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // div)
+        center_x = get_fence_node_dirs(cfg.start_end_points["starting_node"])[0] * self.width_scale
+        center_y = get_fence_node_dirs(cfg.start_end_points["starting_node"])[1] * self.height_scale
+        pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // div)
+        center_x = get_fence_node_dirs(cfg.start_end_points["ending_node"])[0] * self.width_scale
+        center_y = get_fence_node_dirs(cfg.start_end_points["ending_node"])[1] * self.height_scale
+        pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // div)
+
     def quit_plot(self):
         self.quit = True
         pygame.quit()
@@ -182,29 +197,15 @@ class PlotPhotos(Plot):
                                    get_fence_node_dirs(neighbour_node)[1] * self.height_scale
                     if cfg.specials[neighbour_node] and cfg.specials[current_fence_node]:
                         colour = colours['pink']
-                        lwd = 3
                     else:
                         colour = (0, 0, 0)
-                        lwd = get_lwd()
                     if (current_fence_node, neighbour_node) in cfg.deleted_walls \
                             or (neighbour_node, current_fence_node) in cfg.deleted_walls:
                         colour = colours['white']
-                        lwd = 3
 
                     pygame.draw.line(self.window, colour, (start_x, start_y), (end_x, end_y), lwd)
 
-                    center_x = get_fence_node_dirs(cfg.start_end_points["start"])[0] * self.width_scale
-                    center_y = get_fence_node_dirs(cfg.start_end_points["start"])[1] * self.height_scale
-                    pygame.draw.circle(self.window, colours["pink"], (center_x, center_y), self.width_scale // 6)
-                    center_x = get_fence_node_dirs(cfg.start_end_points["end"])[0] * self.width_scale
-                    center_y = get_fence_node_dirs(cfg.start_end_points["end"])[1] * self.height_scale
-                    pygame.draw.circle(self.window, colours["another"], (center_x, center_y), self.width_scale // 6)
-                    center_x = get_fence_node_dirs(cfg.start_end_points["starting_node"])[0] * self.width_scale
-                    center_y = get_fence_node_dirs(cfg.start_end_points["starting_node"])[1] * self.height_scale
-                    pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // 6)
-                    center_x = get_fence_node_dirs(cfg.start_end_points["ending_node"])[0] * self.width_scale
-                    center_y = get_fence_node_dirs(cfg.start_end_points["ending_node"])[1] * self.height_scale
-                    pygame.draw.circle(self.window, colours["black"], (center_x, center_y), self.width_scale // 6)
+        self.draw_maze_path_points()
 
         self.render_plot(plot_img, canvas, self)
 
@@ -771,6 +772,8 @@ class MapMenu(Plot):
 
                 else:
                     self.generate_random_fence()
+                    if cfg.fence_elements > 0:
+                        self.draw_maze_path_points()
 
             if self.quit or self.map_ready:
                 break
