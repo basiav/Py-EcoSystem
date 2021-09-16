@@ -772,8 +772,6 @@ class MapMenu(Plot):
 
                 else:
                     self.generate_random_fence()
-                    if cfg.fence_elements > 0:
-                        self.draw_maze_path_points()
 
             if self.quit or self.map_ready:
                 break
