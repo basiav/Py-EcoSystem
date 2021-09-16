@@ -365,13 +365,8 @@ def dfs_build():
             if not res:
                 continue
             else:
-                # get_maze_path(idx_1, idx_2, start_node_idx)
-                follow_path(idx_1, idx_2, start_node_idx)
+                get_maze_solution(idx_1, idx_2, start_node_idx)
                 break
-
-    # for i in range(len(node_colours)):
-    #     if get_node_colour(i) is not node_colours[i]:
-    #         print("ERROR in colours")
 
 
 def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
@@ -425,7 +420,76 @@ def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
                 return
 
 
-def get_maze_path(start_node, end_node, start_node_idx):
+def get_path_twist_direction(current_black_node, nodes_path, i):
+    """Wyznacza kierunek zakrętu 'czyhającego' za najbliższym czarnym wierzchołkiem na przemierzanej ścieżce nodes_path.
+
+    :param current_black_node: Rozpatrywany czarny wierzchołek.
+    :param nodes_path: Rozpatrywana ścieżka, którą podążamy.
+    :param i: Wskaźnik na miejsce na ścieżce, w którym aktualnie się znajdujemy (nr indeksu current_black_node
+    w nodes_path)."""
+    current_black_node_x, current_black_node_y = get_fence_node_dirs(current_black_node)
+    twists_neighbours = []
+    # Get all the surrounding nodes in all possible directions, let's call them neighbours
+    neighbours = [get_node_neighbour(dir, current_black_node_x, current_black_node_y)
+                  for dir in Directions if get_node_neighbour(dir, current_black_node_x, current_black_node_y) is not None]
+    # Loop through them to look for wall connections with current_black_node
+    if current_black_node is None:
+        return
+    for neighbour in neighbours:
+        # If a wall exists (they're true neighbours) and we're not going backwards on our way - that's our path
+        # intersection (path twists)
+        if check_if_wall_exists(current_black_node, neighbour):
+            if i <= 0:
+                error_exit("fence.py", "get_path_twist_direction",
+                           "i == 0, cannot get the backward node (nodes_path[i - 1]")
+                break
+            # The neighbour is not on our backwards way, we've not come from there
+            if i > 0 and neighbour != nodes_path[i - 1]:
+                twists_neighbours.append(neighbour)
+
+    twists_directions = [neighbours_relations(current_black_node, x) for x in twists_neighbours]
+    if len(twists_neighbours) != len(twists_directions) or i + 1 >= len(nodes_path):
+        return
+    left_turn_dir, left_turn_node, right_turn_dir, right_turn_node = None, None, None, None
+    for dir, node in zip(twists_directions, twists_neighbours):
+        if dir == Directions.Left:
+            left_turn_dir, left_turn_node = dir, node
+        if dir == Directions.Right:
+            right_turn_dir, right_turn_node = dir, node
+    for dir, node in zip(twists_directions, twists_neighbours):
+        if dir not in [Directions.Left, Directions.Right]:
+            if left_turn_dir and left_turn_node and right_turn_dir is None and right_turn_node is None:
+                right_turn_dir, right_turn_node = Directions.Right, node
+            elif right_turn_dir and right_turn_node and left_turn_dir is None and left_turn_node is None:
+                left_turn_dir, left_turn_node = Directions.Left, node
+
+    opposite = False
+    if i > 0:
+        current_black_node_idx = get_fence_node_idx(current_black_node_y, current_black_node_x)
+        previous_node_idx = get_fence_node_idx(
+            get_fence_node_dirs(nodes_path[i - 1])[1],
+            get_fence_node_dirs(nodes_path[i - 1])[0]
+        )
+        if current_black_node_idx < previous_node_idx:
+            opposite = False
+        elif current_black_node_idx > previous_node_idx:
+            opposite = True
+
+    if i + 1 < len(nodes_path) and nodes_path[i + 1] == left_turn_node:
+        return left_turn_dir if opposite else right_turn_dir
+    elif i + 1 < len(nodes_path) and nodes_path[i + 1] == right_turn_node:
+        return right_turn_dir if opposite else left_turn_dir
+
+
+def get_opposite_wall_side(current_side):
+    """If 'left' return 'right', if 'right' return 'left'"""
+    if current_side is Directions.Left:
+        return Directions.Right
+    elif current_side is Directions.Right:
+        return Directions.Left
+
+
+def get_maze_solution(start_node, end_node, start_node_idx):
     """Wyznacza 'rozwiązanie' labiryntu, tj. przejście pomiędzy zadanymi punktami (wierzchołkami).
 
     :param start_node: Start of the labirynth path.
@@ -441,110 +505,38 @@ def get_maze_path(start_node, end_node, start_node_idx):
     wierchołkami.
 
     1. Rozpatrujemy ścieżki od danych wierzchołków do wierzchołka-źródła DFS i znajdujemy pierwszy (idąc od liści)
-    wierzchołek wspólny dla obu tych ścieżek. Wierzchołek ten wyznacza ścieżkę pomiędzy zadanymi wierzchołkami - należy
+    wierzchołek wspólny dla obu tych ścieżek (może być nim wierzchołek-żródło DFS, jeśli zadane wierzchołki znajdują się
+    na innych gałęziach głównych drzewa). Wierzchołek ten wyznacza ścieżkę pomiędzy zadanymi wierzchołkami - należy
     wziąć ścieżkę od jednego zadanego wierzchołka do wierzchołka wspólnego i połączyć ją ze ścieżką od drugiego zadanego
     wierzchołka do wierchołka wspólnego, ale 'odwróconą' (zmiana kierunku krawędzi na przeciwny). Odwracamy krótszą
     z ww. ścieżek, następnie ścieżki 'łączymy'. W otrzymanej końcowej ścieżce wierzchołkiem początkowym jest ten,
     który jest bardziej oddalony od punktu wspólnego, a końcowym ten, który znajduje się bliżej punktu wspólnego.
 
     2. W wygenerowanym w procedurze dfs_visit zbiorze ścian kluczowe są wierchołki czarne. Każdy wierchołek czarny to
-    styk 3 ścian, co oznacza, że wyznacza on 2 lub 3 sąsiadujące ze sobą łamane otwarte (korytarze): 3, jeśli
-    w bezpośrednim sąsiedztwie tego wierzchołka znajduje się inny czarny wierchołek; 2 w przeciwnym wypadku. Interesować
+    styk 3 ścian, co oznacza, że wyznacza on 2 lub 3 sąsiadujące ze sobą łamane otwarte (korytarze). Interesować
     nas będzie ciąg czarnych wierchołków obecnych na otrzymanej w pkt. 1. ścieżce. Każde 2 sąsiednie czarne wierchołki
     w tym ciągu, które jednocześnie nie sąsiadują ze sobą na ścieżce, wyznaczają korytarz, którym da się przejść
-    (wzdłuż, zawartych pomiędzy, wierzchołków szarych). Natomiast każde 3 sąsiednie czarne wierzchołki w tym ciągu
-    wyznaczają 'ślepy zaułek' (pewien zamknięty fragment korytarza, który graniczy z sąsiadującym korytarzem). W ciągu
-    czarnych wierzchołków na ścieżce z pkt. 1. będziemy więc rozpatrywać podciągi trójek najbliższych sobie czarnych
-    wierzchołków, gdzie ostatni czarny wierchołek n-tego podciągu jest pierwszym wierzchołkiem n+1-szego podciągu.
-    W każdym z tych podciągów wybieramy ostatni, trzeci wierzchołek i usuwamy na ścieżce krawedzie łączące go
-    z sąsiadującymi z nim na ścieżce poprzednikiem oraz następnikiem (dowolnego koloru). W ten sposób tworzymy przejścia
-    pomiędzy sąsiednimi 'ślepymi zaułkami' i gwarantujemy 'rozwiązanie' labiryntu pomiędzy dwoma zadanymi punktami,
-    przekształcając zbiór łamanych otwartych ('pseudolabirynt') w labirynt."""
-    pass
-
-
-def get_path_twist_direction(current_black_node, nodes_path, i):
-    current_black_node_x, current_black_node_y = get_fence_node_dirs(current_black_node)
-    twists_neighbours = []
-    # Get all the surrounding nodes in all possible directions, let's call them neighbours
-    neighbours = [get_node_neighbour(dir, current_black_node_x, current_black_node_y) for dir in Directions if get_node_neighbour(dir, current_black_node_x, current_black_node_y) is not None]
-    # Loop through them to look for wall connections with current_black_node
-    if current_black_node is None:
-        print("Current black node is None")
-        return
-    for neighbour in neighbours:
-        # If a wall exists (they're true neighbours) and we're not going backwards on our way - that's our path
-        # intersection (path twists)
-        if check_if_wall_exists(current_black_node, neighbour):
-            if i <= 0:
-                error_exit("fence.py", "get_path_twist_direction",
-                           "i == 0, cannot get the backward node (nodes_path[i - 1]")
-                break
-            # The neighbour is not on our backwards way, we've not come from there
-            if i > 0 and neighbour != nodes_path[i - 1]:
-                twists_neighbours.append(neighbour)
-    twists_directions = [neighbours_relations(current_black_node, x) for x in twists_neighbours]
-    if len(twists_neighbours) != len(twists_directions):
-        print("Length error")
-        return
-    if i + 1 >= len(nodes_path):
-        print("i error")
-        return
-    left_turn_dir, left_turn_node, right_turn_dir, right_turn_node = None, None, None, None
-    for dir, node in zip(twists_directions, twists_neighbours):
-        if dir == Directions.Left:
-            left_turn_dir, left_turn_node = dir, node
-        if dir == Directions.Right:
-            right_turn_dir, right_turn_node = dir, node
-    for dir, node in zip(twists_directions, twists_neighbours):
-        if dir not in [Directions.Left, Directions.Right]:
-            if left_turn_dir and left_turn_node and right_turn_dir is None and right_turn_node is None:
-                right_turn_dir, right_turn_node = Directions.Right, node
-            elif right_turn_dir and right_turn_node and left_turn_dir is None and left_turn_node is None:
-                left_turn_dir, left_turn_node = Directions.Left, node
-    opposite = False
-    ##
-    if i > 0:
-        current_black_node_idx = get_fence_node_idx(current_black_node_y, current_black_node_x)
-        previous_node_idx = get_fence_node_idx(
-            get_fence_node_dirs(nodes_path[i - 1])[1],
-            get_fence_node_dirs(nodes_path[i - 1])[0]
-        )
-        if current_black_node_idx < previous_node_idx:
-            opposite = False
-        elif current_black_node_idx > previous_node_idx:
-            opposite = True
-    # if i > 0 and current_black_node < nodes_path[i - 1]:
-    #     opposite = False
-    # elif i > 0 and current_black_node > nodes_path[i - 1]:
-    #     opposite = True
-    if i + 1 < len(nodes_path) and nodes_path[i + 1] == left_turn_node:
-        print("i", i, left_turn_dir)
-        print("i", i, "Twist dir", left_turn_dir if opposite else right_turn_dir, "previous", nodes_path[i - 1],
-              "current_black_node", current_black_node, "opposite", opposite)
-        return left_turn_dir if opposite else right_turn_dir
-    elif i + 1 < len(nodes_path) and nodes_path[i + 1] == right_turn_node:
-        print("i", i, right_turn_dir)
-        print("i", i, "Twist dir", right_turn_dir if opposite else left_turn_dir, "previous", nodes_path[i - 1],
-              "current_black_node", current_black_node, "opposite", opposite)
-        return right_turn_dir if opposite else left_turn_dir
-    print("i", i, "Twist direction None", "previous", nodes_path[i - 1], "current_black_node", current_black_node,
-          "opposite", opposite)
-
-
-def get_opposite_wall_side(current_side):
-    if current_side is Directions.Left:
-        return Directions.Right
-    elif current_side is Directions.Right:
-        return Directions.Left
-
-
-def follow_path(start_node, end_node, start_node_idx):
+    (wzdłuż, zawartych pomiędzy, wierzchołków szarych). 'Przejście' przez labirynt polegać będzie na przejściu
+    'korytarzami' ww. ścieżki, usuwając po drodze pewne krawędzie. Najpierw wybieramy wierzchołek początkowy
+    (pierwszy czarny) oraz umownie 'stronę' ściany labiryntu, wzdłuż której będziemy się poruszać (umownie lewa/prawa).
+    Następnie, dopóki nie przejdziemy całej ścieżki:
+        a) wybieramy następny czarny wierzchołek
+        b) oceniamy, czy da się z niego przejść wzdłuż 'naszej' strony ścian do następnego wierzchołka na ścieżce
+        - poprzez ocenę naszego położenia względem krawędzi sąsiadów wierzchołka z pkt. a). Wychodzą z niego dwie
+        krawędzie inne niż ta, z której przyszliśmy, w tym jedna jest następną krawędzią naszej ścieżki. Jeśli jest to
+        krawędź 'lewa', a znajdujemy się po stronie 'lewej', to możemy bez problemu poruszać się dalej po tej samej
+        stronie. Jeśli jednak jest to krawędż 'prawa', a znajdujemy się po stronie lewej, usuwamy poprzednią krawędź
+        (tę, z której przyszliśmy) i zmieniamy stronę na przeciwną, co gwarantuje nam dalsze podążanie ścieżką.
+        W proc. dfs_visit powstał zbiór łamanych otwartych, czyli w zasadzie 'pseudolabirynt', zawsze można więc przejść
+        do sąsiedniego korytarza cofając się do wyjścia i wchodząc wejściem do sąsiedniego, zatem teoretycznie nie
+        byłoby potrzeby usuwania krawędzi. Byłoby to jednak wybitnie nielabiryntowe, dlatego stosujemy przejście ścieżką
+        z pkt. 1. z usuwaniem krawędzi w zależności od 'zakrętów' drzewa przeszukiwania wgłąb."""
     first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
     # Zgodność z założeniami
     if not first_common_parent:
         return
 
+    # 1.
     node_with_shorter_path = first_common_parent["node_with_shorter_path"]
     node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
     first_common_node_idx = first_common_parent["first_common_idx"]
@@ -559,6 +551,7 @@ def follow_path(start_node, end_node, start_node_idx):
     nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
                                        total_length)
 
+    # 2A.
     start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
     next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
 
@@ -573,8 +566,9 @@ def follow_path(start_node, end_node, start_node_idx):
     ending_node = get_closest_black_node(end_node)
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
-    wall_side = Directions.Left
+    wall_side = Directions.Left if random.randint(0, 1) % 2 == 0 else Directions.Right
 
+    # 2B.
     while i < len(nodes_path) - 1:
         previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
 
@@ -584,11 +578,11 @@ def follow_path(start_node, end_node, start_node_idx):
         if (previous_node and starting_node) and (previous_node != starting_node) \
                 and (wall_side != get_path_twist_direction(starting_node, nodes_path, i)):
             wall_side = get_opposite_wall_side(wall_side)
-
-            # delete_wall(previous_node, starting_node)
+            delete_wall(previous_node, starting_node)
             cfg.deleted_walls.add((previous_node, starting_node))
             cfg.deleted_walls.add((starting_node, previous_node))
 
+    # Visualisation purposes
     for node in nodes_path:
         cfg.specials[node] = True
 

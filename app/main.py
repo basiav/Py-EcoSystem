@@ -166,7 +166,7 @@ def main():
 
         escape = start_menu.quit
 
-    print("[MAIN] Goodbye! :)")
+    print("[MAIN] Bye :)")
 
 
 if __name__ == '__main__':
