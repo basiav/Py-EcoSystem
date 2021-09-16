@@ -1,3 +1,6 @@
+"""Animal maintenance - movement, increasing/decreasing energy, procreation, checking for overpopulation
+eating other species."""
+
 from common import Thread, Animals, time, random, check_terrain_boundaries, set_terrain_value, set_stats
 import config
 import common

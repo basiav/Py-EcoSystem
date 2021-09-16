@@ -1,3 +1,5 @@
+"""GUI homemade elements: sliders, buttons, text lines."""
+
 import threading
 
 import pygame

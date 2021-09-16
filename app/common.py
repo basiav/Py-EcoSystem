@@ -1,3 +1,5 @@
+"""Classes, functions and import mutual for several .py project files."""
+
 import threading
 from threading import Thread, active_count, Lock, Event
 import time
@@ -16,11 +18,11 @@ from matplotlib.figure import Figure
 
 matplotlib.use("Agg")
 
-terrain_lock = Lock()
-stats_lock = Lock()
+terrain_lock = Lock()  # Safe memory sharing, secures terrain (map) usage by animals (animal movement/procreation)
+stats_lock = Lock()  # Safe memory sharing, secures statistics array usage by animals (animals born/deceased)
 
-can_run = Event()
-terminate_threads = Event()
+can_run = Event()  # Responsible for pausing simulation
+terminate_threads = Event()  # Responsible for terminating simulation in order to re-run it
 
 
 class Animals(Enum):
@@ -48,21 +50,25 @@ class Colour(Enum):
 
 
 def check_terrain_boundaries(x, y):
+    """Checks whether we are within terrain (map) boundaries."""
     return 0 <= x < cfg.N and 0 <= y < cfg.N
 
 
 def set_terrain_value(x, y, value):
+    """Safe multi-threading memory sharing."""
     global terrain_lock
     with terrain_lock:
         cfg.terrain[x][y] = value
 
 
 def set_stats(animal_species, value):
+    """Safe multi-threading memory sharing."""
     global stats_lock
     with stats_lock:
         cfg.stats[animal_species] += value
 
 
+# Auxiliary function
 def error_exit(file_name, def_name, message):
     print("[", file_name, "] ", "[", def_name, "] ", "ERROR: ", message)
     return

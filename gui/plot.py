@@ -1,3 +1,5 @@
+"""Program visualisation. Starting menu, general settings menu, map settings menu, simulation window."""
+
 import os
 os.chdir('../')
 

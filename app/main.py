@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+
+"""Main program in here."""
+
 import sys
 sys.path.append('../')
 
@@ -17,6 +20,7 @@ matplotlib.use("Agg")
 
 
 def terminate_animal_threads():
+    """Terminate and join all animal threads."""
     # Set terminate_threads Event() flag
     common.terminate_threads.set()
 
@@ -34,14 +38,17 @@ def terminate_animal_threads():
 
 
 def create_start_menu():
+    """Creates and opens start menu."""
     return StartMenu(800, 650)
 
 
 def create_sample_fence():
+    """Creates random maze (labyrinth/fence)."""
     dfs_build()
 
 
 def start_simulation():
+    """Performs simulation."""
     plot = PlotPhotos(agg)
 
     fig = Figure(figsize=(2, 2), dpi=800)
@@ -51,11 +58,13 @@ def start_simulation():
         = config.get_aliased_global_variable_names()
 
     def update_stats_arr():
+        """Updates animal statistics (newborn/deceased)."""
         stats_arrs['rabbits'].append(stats['rabbits'])
         stats_arrs['wolves_females'].append(stats['wolves_females'])
         stats_arrs['wolves_males'].append(stats['wolves_males'])
 
     def create_bar_img():
+        """Creates population plots img."""
         update_stats_arr()
         nonlocal canvas, fig
         fig.clf()
@@ -71,12 +80,14 @@ def start_simulation():
         return renderer.tostring_rgb()
 
     def create_animal_on_random_pos(animal):
+        """Places given animal on a random position."""
         return Rabbit(random.randint(0, N - 1), random.randint(0, N - 1)) if animal == Animals.Rabbit \
             else Wolf(random.randint(0, N - 1), random.randint(0, N - 1))
 
     plt.xlim(0, 1)
     plt.ylim(0, 20)
 
+    # Threads safety - enables them to run
     common.can_run.set()
     common.terminate_threads.clear()
 
@@ -129,6 +140,8 @@ def start_simulation():
 
 
 def main():
+    """Main program."""
+    # Make sure threads are terminated, clean-up
     common.terminate_threads.set()
 
     start_menu = create_start_menu()
