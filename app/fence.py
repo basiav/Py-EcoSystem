@@ -325,7 +325,7 @@ def dfs_build():
     2. Wyznacza losowe początki n poszczególnych elementów ('wysp') labiryntu, czyli źródła n pierwotnych wywołań DFS.
     3. Wywołuje n razy procedurę dfs_visit, tworząc ściany n 'wysp' labiryntu.
     4. Wyznacza po 2 losowe punkty w obrębie każdej 'wyspy' (każdego drzewa przeszukiwania wgłąb), pomiędzy którymi
-    tworzone będzie 'rozwiązanie' labiryntu (patrz procedura get_maze_path)."""
+    tworzone będzie 'rozwiązanie' labiryntu (patrz procedura get_maze_solution)."""
     global maze_elements_sets
     reset_node_colours()
     reset_parents_and_children()
@@ -385,7 +385,7 @@ def dfs_visit(current_node, wall_no, walls_already_built, maze_element_id):
     W wyniku działania tej procedury powstaje zbiór korytarzy labiryntu, bardziej lub mniej 'rozgałęzionych'.
     Są to jednak łamane otwarte, zatem do każdej z nich da się wejść z zewnątrz (spoza labiryntu), ale nie istnieją
     przejścia pomiędzy nimi (inne niż wyjście z korytarzy w obrębie danej łamanej poza labirynt i wejście do
-    sąsiadującej łamanej). Przejścia pomiędzy łamanymi tworzone są w procedurze get_maze_path."""
+    sąsiadującej łamanej). Przejścia pomiędzy łamanymi tworzone są w procedurze get_maze_solution."""
     global node_colours, parents, maze_elements_sets
     node_colours[current_node] = Colour.Grey
     maze_elements_sets[maze_element_id].add(current_node)
@@ -562,7 +562,7 @@ def get_maze_solution(start_node, end_node, start_node_idx):
         starting_node = start_next_black_node
         i = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[2]
     if node_colours[starting_node] is not Colour.Black:
-        error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
+        error_exit("fence.py", "get_maze_solution", "starting_node is not Colour.Black")
     ending_node = get_closest_black_node(end_node)
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
@@ -622,7 +622,7 @@ def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_wi
 def get_next_black_node(current_node, previous_node, nodes_path, i):
     """Returns a pair of the next black (DFS tree colouring) and its' predecessor on a given node path.
     :param current_node: The current node. We're searching for its' next black neighbour on the given path.
-    :param previous_node: Predecessor of the current node. Needed for the purposes of the get_maze_path function.
+    :param previous_node: Predecessor of the current node. Needed for the purposes of the get_maze_solution function.
     :param nodes_path: The graph path to follow.
     :param i: Position on the graph path to follow.
     :return: Pair of (predecessor, next black node).
