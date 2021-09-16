@@ -557,7 +557,7 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
                            "i == 0, cannot get the backward node (nodes_path[i - 1]")
                 break
             # The neighbour is not on our backwards way, we've not come from there
-            if i > 0 and not neighbour == nodes_path[i - 1]:
+            if i > 0 and not (neighbour == nodes_path[i - 1]):
                 twists_neighbours.append(neighbour)
     twists_directions = [neighbours_relations(current_black_node, x) for x in twists_neighbours]
     if len(twists_neighbours) != len(twists_directions):
@@ -588,11 +588,13 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
     elif i + 1 < len(nodes_path) and nodes_path[i + 1] == right_turn_node:
         return right_turn_dir if not opposite else left_turn_dir
 
+
 def get_opposite_wall_side(current_side):
     if current_side is Directions.Left:
         return Directions.Right
     elif current_side is Directions.Right:
         return Directions.Left
+
 
 def follow_path(start_node, end_node, start_node_idx):
     first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
@@ -634,6 +636,7 @@ def follow_path(start_node, end_node, start_node_idx):
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
     wall_side = Directions.Left
+    # print("Twist direction", get_path_twist_direction(starting_node, nodes_path, i))
 
     while i < len(nodes_path) - 1:
         previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
@@ -664,6 +667,8 @@ def follow_path(start_node, end_node, start_node_idx):
             # delete_wall(previous_node, starting_node)
             cfg.deleted_walls.add((previous_node, starting_node))
             cfg.deleted_walls.add((starting_node, previous_node))
+
+        # previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
 
         # previous_node, starting_node, i = get_next_black_node(nodes_path[starting_node], starting_node, nodes_path, i + 1)
         # previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
@@ -740,6 +745,7 @@ def get_closest_black_node(node_idx):
         if node_colours[node_idx] is Colour.Black:
             return node_idx
         node_idx = parents[node_idx]
+    return node_idx
 
 
 # Auxiliary function
