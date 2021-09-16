@@ -150,10 +150,7 @@ crashlytics-build.properties
 fabric.properties
 
 # _build from sphinx
-_build/*
-!_build/html
-_build/html/*
-!_build/html/index.html
+_build/
 
 # other sphinx files
 conf.py
