@@ -557,7 +557,7 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
                            "i == 0, cannot get the backward node (nodes_path[i - 1]")
                 break
             # The neighbour is not on our backwards way, we've not come from there
-            if i > 0 and not (neighbour == nodes_path[i - 1]):
+            if i > 0 and neighbour != nodes_path[i - 1]:
                 twists_neighbours.append(neighbour)
     twists_directions = [neighbours_relations(current_black_node, x) for x in twists_neighbours]
     if len(twists_neighbours) != len(twists_directions):
@@ -567,26 +567,44 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
         print("i error")
         return
     left_turn_dir, left_turn_node, right_turn_dir, right_turn_node = None, None, None, None
-    for dir, node in twists_directions, twists_neighbours:
+    for dir, node in zip(twists_directions, twists_neighbours):
         if dir == Directions.Left:
             left_turn_dir, left_turn_node = dir, node
         if dir == Directions.Right:
             right_turn_dir, right_turn_node = dir, node
-    for dir, node in twists_directions, twists_neighbours:
+    for dir, node in zip(twists_directions, twists_neighbours):
         if dir not in [Directions.Left, Directions.Right]:
             if left_turn_dir and left_turn_node and right_turn_dir is None and right_turn_node is None:
-                right_turn_dir, right_turn_node = dir, node
+                right_turn_dir, right_turn_node = Directions.Right, node
             elif right_turn_dir and right_turn_node and left_turn_dir is None and left_turn_node is None:
-                left_turn_dir, left_turn_node = dir, node
+                left_turn_dir, left_turn_node = Directions.Left, node
     opposite = False
-    if i > 0 and current_black_node < nodes_path[i - 1]:
-        opposite = False
-    elif i > 0 and current_black_node > nodes_path[i - 1]:
-        opposite = True
+    ##
+    if i > 0:
+        current_black_node_idx = get_fence_node_idx(current_black_node_y, current_black_node_x)
+        previous_node_idx = get_fence_node_idx(
+            get_fence_node_dirs(nodes_path[i - 1])[1],
+            get_fence_node_dirs(nodes_path[i - 1])[0]
+        )
+        if current_black_node_idx < previous_node_idx:
+            opposite = False
+        elif current_black_node_idx > previous_node_idx:
+            opposite = True
+    # if i > 0 and current_black_node < nodes_path[i - 1]:
+    #     opposite = False
+    # elif i > 0 and current_black_node > nodes_path[i - 1]:
+    #     opposite = True
     if i + 1 < len(nodes_path) and nodes_path[i + 1] == left_turn_node:
-        return left_turn_dir if not opposite else right_turn_dir
+        print("i", i, "turn", left_turn_dir)
+        print("i", i, "Twist dir", left_turn_dir if opposite else right_turn_dir, "previous", nodes_path[i - 1],
+              "current_black_node", current_black_node, "opposite", opposite)
+        return left_turn_dir if opposite else right_turn_dir
     elif i + 1 < len(nodes_path) and nodes_path[i + 1] == right_turn_node:
-        return right_turn_dir if not opposite else left_turn_dir
+        print("i", i, "turn", right_turn_dir)
+        print("i", i, "Twist dir", right_turn_dir if opposite else left_turn_dir, "previous", nodes_path[i - 1],
+              "current_black_node", current_black_node, "opposite", opposite)
+        return right_turn_dir if opposite else left_turn_dir
+    print("Twist direction None")
 
 
 def get_opposite_wall_side(current_side):
@@ -612,7 +630,7 @@ def follow_path(start_node, end_node, start_node_idx):
     total_length = shorter_path_length + longer_path_length
 
     reverse_path(node_with_shorter_path, first_common_node_idx)
-    print_reversed_path(first_common_node_idx, node_with_shorter_path)
+    # print_reversed_path(first_common_node_idx, node_with_shorter_path)
 
     nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
                                        total_length)
@@ -660,8 +678,10 @@ def follow_path(start_node, end_node, start_node_idx):
         if i >= len(nodes_path) - 1:
             break
 
+        # print("i", i, "Wall side", wall_side, "Twist direction", get_path_twist_direction(starting_node, nodes_path, i))
+
         if (previous_node and starting_node) and (previous_node != starting_node) \
-                and wall_side is not get_path_twist_direction(starting_node, nodes_path, i):
+                and (wall_side != get_path_twist_direction(starting_node, nodes_path, i)):
             wall_side = get_opposite_wall_side(wall_side)
 
             # delete_wall(previous_node, starting_node)
