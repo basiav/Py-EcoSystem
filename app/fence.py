@@ -460,83 +460,7 @@ def get_maze_path(start_node, end_node, start_node_idx):
     z sąsiadującymi z nim na ścieżce poprzednikiem oraz następnikiem (dowolnego koloru). W ten sposób tworzymy przejścia
     pomiędzy sąsiednimi 'ślepymi zaułkami' i gwarantujemy 'rozwiązanie' labiryntu pomiędzy dwoma zadanymi punktami,
     przekształcając zbiór łamanych otwartych ('pseudolabirynt') w labirynt."""
-    first_common_parent = get_first_common_parent(start_node, end_node, start_node_idx)
-    # Zgodność z założeniami
-    if not first_common_parent:
-        return
-
-    node_with_shorter_path = first_common_parent["node_with_shorter_path"]
-    node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
-    first_common_node_idx = first_common_parent["first_common_idx"]
-    # print("first_common_node_idx", first_common_node_idx)
-    shorter_path_length = first_common_parent["path_length"]
-    cfg.start_end_points["start"], cfg.start_end_points["end"] = node_with_longer_path, node_with_shorter_path
-    longer_path_length = get_parent_path_length(node_with_longer_path, first_common_node_idx)
-    total_length = shorter_path_length + longer_path_length
-
-    reverse_path(node_with_shorter_path, first_common_node_idx)
-    print_reversed_path(first_common_node_idx, node_with_shorter_path)
-
-    nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
-                                       total_length)
-    # print("Nodes path", nodes_path)
-
-    start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
-    next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
-
-    if check_if_wall_exists(next_black_node, start_next_black_node):
-        starting_node = next_black_node
-        i = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[2]
-    else:
-        starting_node = start_next_black_node
-        i = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[2]
-    if node_colours[starting_node] is not Colour.Black:
-        error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
-    # print("Starting node", starting_node, node_colours[starting_node])
-
-    ending_node = get_closest_black_node(end_node)
-    # print("Ending node", ending_node, node_colours[ending_node])
-    cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
-
-    while i < len(nodes_path) - 1:
-        # previous_node, starting_node, i = get_next_black_node(parents[starting_node], starting_node, nodes_path, i + 1)
-        previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
-        print(previous_node, starting_node)
-
-        # if previous_node == starting_node:
-        #     break
-
-        if (previous_node and starting_node) and (previous_node == starting_node) \
-                and (starting_node != node_with_longer_path):
-            # Delete the wall between previous node and starting node
-            cfg.deleted_walls.add((previous_node, starting_node))
-            cfg.deleted_walls.add((starting_node, previous_node))
-            # Delete the wall between starting node and the following node
-            if i + 1 < len(nodes_path):
-                following_node = nodes_path[i + 1]
-                delete_wall(starting_node, following_node)
-                cfg.deleted_walls.add((following_node, starting_node))
-                cfg.deleted_walls.add((starting_node, following_node))
-
-        if i >= len(nodes_path) - 1:
-            break
-
-        # previous_node, starting_node, i = get_next_black_node(nodes_path[starting_node], starting_node, nodes_path, i + 1)
-        previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
-        print(previous_node, starting_node)
-
-        if (previous_node and starting_node) and (previous_node != starting_node):
-            delete_wall(previous_node, starting_node)
-            cfg.deleted_walls.add((previous_node, starting_node))
-            if i + 1 < len(nodes_path):
-                following_node = nodes_path[i + 1]
-                delete_wall(starting_node, following_node)
-                cfg.deleted_walls.add((starting_node, following_node))
-                cfg.deleted_walls.add((following_node, previous_node))
-        # print("previous_node, starting_node", previous_node, starting_node)
-
-    for node in nodes_path:
-        cfg.specials[node] = True
+    pass
 
 
 def get_path_twist_direction(current_black_node, nodes_path, i):
@@ -595,16 +519,17 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
     # elif i > 0 and current_black_node > nodes_path[i - 1]:
     #     opposite = True
     if i + 1 < len(nodes_path) and nodes_path[i + 1] == left_turn_node:
-        print("i", i, "turn", left_turn_dir)
+        print("i", i, left_turn_dir)
         print("i", i, "Twist dir", left_turn_dir if opposite else right_turn_dir, "previous", nodes_path[i - 1],
               "current_black_node", current_black_node, "opposite", opposite)
         return left_turn_dir if opposite else right_turn_dir
     elif i + 1 < len(nodes_path) and nodes_path[i + 1] == right_turn_node:
-        print("i", i, "turn", right_turn_dir)
+        print("i", i, right_turn_dir)
         print("i", i, "Twist dir", right_turn_dir if opposite else left_turn_dir, "previous", nodes_path[i - 1],
               "current_black_node", current_black_node, "opposite", opposite)
         return right_turn_dir if opposite else left_turn_dir
-    print("Twist direction None")
+    print("i", i, "Twist direction None", "previous", nodes_path[i - 1], "current_black_node", current_black_node,
+          "opposite", opposite)
 
 
 def get_opposite_wall_side(current_side):
@@ -623,18 +548,16 @@ def follow_path(start_node, end_node, start_node_idx):
     node_with_shorter_path = first_common_parent["node_with_shorter_path"]
     node_with_longer_path = start_node if node_with_shorter_path == end_node else end_node
     first_common_node_idx = first_common_parent["first_common_idx"]
-    # print("first_common_node_idx", first_common_node_idx)
+
     shorter_path_length = first_common_parent["path_length"]
     cfg.start_end_points["start"], cfg.start_end_points["end"] = node_with_longer_path, node_with_shorter_path
     longer_path_length = get_parent_path_length(node_with_longer_path, first_common_node_idx)
     total_length = shorter_path_length + longer_path_length
 
     reverse_path(node_with_shorter_path, first_common_node_idx)
-    # print_reversed_path(first_common_node_idx, node_with_shorter_path)
 
     nodes_path = get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_with_longer_path,
                                        total_length)
-    # print("Nodes path", nodes_path)
 
     start_next_black_node = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[1]
     next_black_node = get_next_black_node(start_next_black_node, start_next_black_node, nodes_path, 0)[1]
@@ -647,38 +570,16 @@ def follow_path(start_node, end_node, start_node_idx):
         i = get_next_black_node(node_with_longer_path, node_with_longer_path, nodes_path, 0)[2]
     if node_colours[starting_node] is not Colour.Black:
         error_exit("fence.py", "get_maze_path", "starting_node is not Colour.Black")
-    # print("Starting node", starting_node, node_colours[starting_node])
-
     ending_node = get_closest_black_node(end_node)
-    # print("Ending node", ending_node, node_colours[ending_node])
     cfg.start_end_points["starting_node"], cfg.start_end_points["ending_node"] = starting_node, ending_node
 
     wall_side = Directions.Left
-    # print("Twist direction", get_path_twist_direction(starting_node, nodes_path, i))
 
     while i < len(nodes_path) - 1:
         previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
-        # print(previous_node, starting_node)
-
-        # if previous_node == starting_node:
-        #     break
-
-        # if (previous_node and starting_node) and (previous_node == starting_node) \
-        #         and (starting_node != node_with_longer_path):
-        #     # Delete the wall between previous node and starting node
-        #     cfg.deleted_walls.add((previous_node, starting_node))
-        #     cfg.deleted_walls.add((starting_node, previous_node))
-        #     # Delete the wall between starting node and the following node
-        #     if i + 1 < len(nodes_path):
-        #         following_node = nodes_path[i + 1]
-        #         delete_wall(starting_node, following_node)
-        #         cfg.deleted_walls.add((following_node, starting_node))
-        #         cfg.deleted_walls.add((starting_node, following_node))
 
         if i >= len(nodes_path) - 1:
             break
-
-        # print("i", i, "Wall side", wall_side, "Twist direction", get_path_twist_direction(starting_node, nodes_path, i))
 
         if (previous_node and starting_node) and (previous_node != starting_node) \
                 and (wall_side != get_path_twist_direction(starting_node, nodes_path, i)):
@@ -687,22 +588,6 @@ def follow_path(start_node, end_node, start_node_idx):
             # delete_wall(previous_node, starting_node)
             cfg.deleted_walls.add((previous_node, starting_node))
             cfg.deleted_walls.add((starting_node, previous_node))
-
-        # previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
-
-        # previous_node, starting_node, i = get_next_black_node(nodes_path[starting_node], starting_node, nodes_path, i + 1)
-        # previous_node, starting_node, i = get_next_black_node(nodes_path[i + 1], starting_node, nodes_path, i + 1)
-        # print(previous_node, starting_node)
-
-        # if (previous_node and starting_node) and (previous_node != starting_node):
-        #     delete_wall(previous_node, starting_node)
-        #     cfg.deleted_walls.add((previous_node, starting_node))
-        #     if i + 1 < len(nodes_path):
-        #         following_node = nodes_path[i + 1]
-        #         delete_wall(starting_node, following_node)
-        #         cfg.deleted_walls.add((starting_node, following_node))
-        #         cfg.deleted_walls.add((following_node, previous_node))
-        # print("previous_node, starting_node", previous_node, starting_node)
 
     for node in nodes_path:
         cfg.specials[node] = True
@@ -829,9 +714,6 @@ def reverse_path(node_beginning, node_end):
     """Takes two nodes on one DFS tree branch, processes the DFS tree path between them and reverses this path."""
     global parents, children
     if node_beginning == node_end:
-        # children[node_beginning] = node_beginning
-        # print("End point | CHILD of ", node_beginning, "is", children[node_beginning])
         return
     children[parents[node_beginning]] = node_beginning
-    # print("CHILD of ", node_beginning, "is", children[node_beginning])
     reverse_path(parents[node_beginning], node_end)
