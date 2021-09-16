@@ -123,6 +123,7 @@ def get_move_direction(delta_x, delta_y):
 
 def can_make_move(current_row, current_column, delta_x, delta_y):
     """Decides whether an animal can make a certain move or not, considering fence placement and map boundaries.
+
     :param current_row: current x position of an animal
     :param current_column: current y position of an animal
     :param delta_x: x coordinate of animal's movement vector
@@ -425,8 +426,7 @@ def get_path_twist_direction(current_black_node, nodes_path, i):
 
     :param current_black_node: Rozpatrywany czarny wierzchołek.
     :param nodes_path: Rozpatrywana ścieżka, którą podążamy.
-    :param i: Wskaźnik na miejsce na ścieżce, w którym aktualnie się znajdujemy (nr indeksu current_black_node
-    w nodes_path)."""
+    :param i: Wskaźnik na miejsce na ścieżce, w którym aktualnie się znajdujemy (nr indeksu current_black_node w nodes_path)."""
     current_black_node_x, current_black_node_y = get_fence_node_dirs(current_black_node)
     twists_neighbours = []
     # Get all the surrounding nodes in all possible directions, let's call them neighbours
@@ -594,6 +594,7 @@ def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_wi
     - the shorter one (reversed), starting in node_with_shorter_path, which is a reverse of the DFS-parent-nodes
     path (children[]).
     Returns a concatenation of these two paths, hence a path between: node_with_longer_path and node_with_shorter_path.
+
     :param node_with_shorter_path: Beginning node of the path to reverse.
     :param first_common_node_idx: The first node that is mutual for both paths. It can be any node, including the DFS
     source node.
@@ -621,6 +622,7 @@ def get_joined_nodes_path(node_with_shorter_path, first_common_node_idx, node_wi
 
 def get_next_black_node(current_node, previous_node, nodes_path, i):
     """Returns a pair of the next black (DFS tree colouring) and its' predecessor on a given node path.
+
     :param current_node: The current node. We're searching for its' next black neighbour on the given path.
     :param previous_node: Predecessor of the current node. Needed for the purposes of the get_maze_solution function.
     :param nodes_path: The graph path to follow.
@@ -659,11 +661,11 @@ def get_parent_path_length(child_node, parent_node):
 def get_first_common_parent(node_idx_1, node_idx_2, start_node_idx):
     """Takes two nodes and processes their DFS tree paths (parents[]). Searches for the first node that is mutual
     for those two paths (any node, including the DFS source, if the two nodes are on different DFS tree branches).
+
     :param node_idx_1: First node.
     :param node_idx_2: Second node.
     :param start_node_idx: DFS source node. Along with the 'parents' array, it constitutes the DFS tree.
-    :return: A dictionary of {node with a shorter 'DFS parent' path to the DFS source; first mutual node;
-    length of the shorter 'DFS parent' path}
+    :return: A dictionary of {node with a shorter 'DFS parent' path to the DFS source; first mutual node; length of the shorter 'DFS parent' path}
     """
     global parents
     node_idx_1_parent_path = set()

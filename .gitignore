@@ -148,3 +148,13 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+# _build from sphinx
+_build/
+
+# other sphinx files
+conf.py
+index.rst
+make.bat
+Makefile
+
