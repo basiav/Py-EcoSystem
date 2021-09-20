@@ -7,6 +7,8 @@ Program for creating simple ecosystem simulations using **Python threading libra
 <img src="https://github.com/basiav/Py-EcoSystem/blob/main/utils/anim_1.png"/>
 
 ### Task Description
+D. Van Tassel - „Praktyka programowania”
+
 <img src="https://github.com/basiav/Py-EcoSystem/blob/main/utils/task.png" width="600"/>
 
 ### Running the program
