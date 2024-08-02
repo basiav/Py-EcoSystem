@@ -1,5 +1,5 @@
 # Py-EcoSystem
-### author: Barbara Wojtarowicz, Sept 2021
+### author: Barbara Wojtarowicz
 
 Program for creating simple ecosystem simulations using **Python threading library**. Each animal's behaviour is handled by a different thread. The main thread supervises the animals' threads and communicates with them using *threading.Event* objects. Shared memory multithreading safety is supplied with simple *threading.Lock* objects.
 
